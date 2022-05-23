@@ -39,7 +39,7 @@ entity ALU is
         A: in std_logic_vector(31 downto 0);
         B: in std_logic_vector(31 downto 0);
         Funct: in std_logic_vector (2 downto 0);
-        --Aux: in std_logic;
+        Aux: in std_logic;
         --PCNext: in std_logic_vector(31 downto 0);
         --JumpI: in std_logic;
         --JumpRel: in std_logic;
@@ -65,15 +65,27 @@ end ALU;
 architecture Behavioral of ALU is
 
 begin
-    process (Funct, A, B)
+    process (Funct, A, B, Aux)
     begin
         case Funct is
-            when funct_ADD => X <= std_logic_vector(unsigned(A) + unsigned(B));
+            when funct_ADD =>
+                if Aux = '0' then
+                    X <= std_logic_vector(unsigned(A) + unsigned(B));
+                else
+                    X <= std_logic_vector(unsigned(A) - unsigned(B));
+                end if;
+
             when funct_SLL => X <= std_logic_vector(shift_left(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
             when funct_SLT => if signed(A) < signed(B) then X <= x"00000001"; else X <= x"00000000"; end if;
             when funct_SLTU => if unsigned(A) < unsigned(B) then X <= x"00000001"; else X <= x"00000000"; end if;
             when funct_XOR => X <= A xor B;
-            when funct_SRL => X <= std_logic_vector(shift_right(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
+            when funct_SRL =>
+                if Aux = '0' then
+                    X <= std_logic_vector(shift_right(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
+                else
+                    X <= std_logic_vector(shift_right(signed(A), to_integer(unsigned(B(4 downto 0)))));
+                end if;
+
             when funct_OR => X <= A or B;
             when funct_AND => X <= A and B;
             when others => X <= x"40400404";

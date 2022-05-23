@@ -62,7 +62,7 @@ begin
     variable curr: std_logic_vector (2 downto 0);
     begin
         if (RST = '0') then
-            Registers <= (1 => x"00000001", others => x"00000000");
+            Registers <= (1 => x"00000001", 10 => std_logic_vector(to_unsigned(10, 32)), 11 => std_logic_vector(to_unsigned(1997, 32)), others => x"00000000");
         elsif rising_edge(CLK) then
             if WrEn = '1' and unsigned(WrRegNo) /= 0 then
                 Registers(to_integer(unsigned(WrRegNo))) <= WrData;

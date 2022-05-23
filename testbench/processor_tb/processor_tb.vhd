@@ -12,9 +12,9 @@ architecture testbench of processor_tb is
 
 begin
     dut: entity work.processor
-        port map (
-            CLK => CLK,
-            RST => RST
+    port map (
+        CLK => CLK,
+        RST => RST
         );
 
     process

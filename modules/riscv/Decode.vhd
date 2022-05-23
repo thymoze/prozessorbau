@@ -82,7 +82,7 @@ begin
         end if;
         DestRegNo <= Inst(11 downto 7);
         Aux <= Inst(30);
-        if funct_ADD = funct3 and opcode = "0010011" then
+        if (funct_ADD = funct3 and opcode = opcode_OP_IMM) then
             Aux <= '0';
         end if;
 

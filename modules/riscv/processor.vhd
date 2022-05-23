@@ -15,6 +15,8 @@ architecture Behavioral of processor is
 
     signal funct : std_logic_vector (2 downto 0);
     signal imm : std_logic_vector (31 downto 0);
+    signal aux : std_logic;
+
     signal destWrEn : std_logic;
     signal destRegNo : std_logic_vector (4 downto 0);
 
@@ -57,6 +59,7 @@ begin
             Inst => imem_O,
             Funct => funct,
             Imm => imm,
+            Aux => aux,
             DestWrEn => destWrEn,
             DestRegNo => destRegNo,
             SrcRegNo1 => srcRegNo1,
@@ -69,6 +72,7 @@ begin
             A => data1,
             B => dataSel,
             Funct => funct,
+            Aux => aux,
             DestWrEnI => destWrEn,
             DestRegNoI => destRegNo,
             X => wrData,
