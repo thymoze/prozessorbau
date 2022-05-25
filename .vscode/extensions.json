@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "rjyoung.vscode-modern-vhdl-support",
+        "vinrobot.vhdl-formatter",
+        "EditorConfig.EditorConfig"
+    ]
+}

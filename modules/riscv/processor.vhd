@@ -10,7 +10,7 @@ entity processor is
 end processor;
 
 architecture Behavioral of processor is
-    attribute mark_debug: string;
+    attribute mark_debug : string;
 
     signal inc_O : std_logic_vector (9 downto 0);
     signal imem_O : std_logic_vector (31 downto 0);
@@ -26,18 +26,18 @@ architecture Behavioral of processor is
     signal srcRegNo2 : std_logic_vector (4 downto 0);
     signal selSrc : std_logic;
 
-    signal wrData : std_logic_vector (31 downto 0);
-    attribute mark_debug of wrData: signal is "true";
+    signal aluX : std_logic_vector (31 downto 0);
+    attribute mark_debug of aluX : signal is "true";
     signal wrEn : std_logic;
-    attribute mark_debug of wrEn: signal is "true";
+    attribute mark_debug of wrEn : signal is "true";
     signal wrRegNo : std_logic_vector (4 downto 0);
-    attribute mark_debug of wrRegNo: signal is "true";
+    attribute mark_debug of wrRegNo : signal is "true";
 
-    signal data1 : std_logic_vector (31 downto 0);
-    attribute mark_debug of data1: signal is "true";
-    signal data2 : std_logic_vector (31 downto 0);
+    signal regData1 : std_logic_vector (31 downto 0);
+    attribute mark_debug of regData1 : signal is "true";
+    signal regData2 : std_logic_vector (31 downto 0);
     signal dataSel : std_logic_vector (31 downto 0);
-    attribute mark_debug of dataSel: signal is "true";
+    attribute mark_debug of dataSel : signal is "true";
 
 begin
     inc : entity work.Inc10Bit
@@ -50,7 +50,7 @@ begin
     mux : entity work.MUX
         port map(
             L => imm,
-            H => data2,
+            H => regData2,
             Sel => selSrc,
             O => dataSel
         );
@@ -77,27 +77,61 @@ begin
 
     alu : entity work.ALU
         port map(
-            A => data1,
+            A => regData1,
             B => dataSel,
             Funct => funct,
             Aux => aux,
             DestWrEnI => destWrEn,
             DestRegNoI => destRegNo,
-            X => wrData,
+            X => aluX,
             DestWrEnO => wrEn,
             DestRegNoO => wrRegNo
+        );
+
+    mem : entity work.MemStage
+        port map(
+            CLK => CLK;
+            RST => RST;
+
+            -- Inputs
+            DestDataI => aluX;
+            DestWrEnI => ;
+            DestRegNoI => ;
+
+            MemAccessI => ;
+            MemWrData => ;
+            MemByteEna => ;
+
+            FunctI => ;
+            StallI => ;
+
+            -- Outputs
+            DestDataO => memDestData;
+            DestWrEnO => ;
+            DestRegNoO => ;
+
+            MemAccessO => ;
+            MemRdData => ;
+
+            FunctO => ;
+            StallO =>
         );
 
     regset : entity work.RegisterSet
         port map(
             CLK => CLK,
             RST => RST,
+
+            -- Inputs
             RdRegNo1 => srcRegNo1,
             RdRegNo2 => srcRegNo2,
+
             WrEn => wrEn,
             WrRegNo => wrRegNo,
-            WrData => wrData,
-            RdData1 => data1,
-            RdData2 => data2
+            WrData => memDestData,
+
+            -- Outputs
+            RdData1 => regData1,
+            RdData2 => regData2
         );
 end Behavioral;
