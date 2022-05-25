@@ -10,6 +10,8 @@ entity processor is
 end processor;
 
 architecture Behavioral of processor is
+    attribute mark_debug: string;
+
     signal inc_O : std_logic_vector (9 downto 0);
     signal imem_O : std_logic_vector (31 downto 0);
 
@@ -25,12 +27,17 @@ architecture Behavioral of processor is
     signal selSrc : std_logic;
 
     signal wrData : std_logic_vector (31 downto 0);
+    attribute mark_debug of wrData: signal is "true";
     signal wrEn : std_logic;
+    attribute mark_debug of wrEn: signal is "true";
     signal wrRegNo : std_logic_vector (4 downto 0);
+    attribute mark_debug of wrRegNo: signal is "true";
 
     signal data1 : std_logic_vector (31 downto 0);
+    attribute mark_debug of data1: signal is "true";
     signal data2 : std_logic_vector (31 downto 0);
     signal dataSel : std_logic_vector (31 downto 0);
+    attribute mark_debug of dataSel: signal is "true";
 
 begin
     inc : entity work.Inc10Bit
@@ -48,9 +55,10 @@ begin
             O => dataSel
         );
 
-    imem : entity work.imem_Task24
+    imem : entity work.imem_Task27
         port map(
             address => inc_O,
+            Clock => CLK,
             q => imem_O
         );
 

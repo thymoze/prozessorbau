@@ -204,7 +204,7 @@ set_property PACKAGE_PIN Y9 [get_ports GCLK]
 #set_property PACKAGE_PIN P16 [get_ports {BTNC}];  # "BTNC"
 #set_property PACKAGE_PIN R16 [get_ports {BTND}];  # "BTND"
 #set_property PACKAGE_PIN N15 [get_ports {BTNL}];  # "BTNL"
-set_property PACKAGE_PIN R18 [get_ports BTNR]
+set_property PACKAGE_PIN R18 [get_ports {BTNR}];    
 #set_property PACKAGE_PIN T18 [get_ports {BTNU}];  # "BTNU"
 
 # ----------------------------------------------------------------------------
@@ -372,4 +372,6 @@ set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 35]];
 
 # Note that the bank voltage for IO Bank 13 is fixed to 3.3V on ZedBoard.
 set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 13]]
+
+
 
