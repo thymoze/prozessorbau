@@ -40,19 +40,41 @@ end ExecuteStage;
 
 architecture Behavioral of ExecuteStage is
 begin
-    FunctO <= FunctI;
-    SrcData1O <= SrcData1I;
-    SrcData2O <= SrcData2I;
-    DestWrEnO <= DestWrEnI;
-    DestRegNoO <= DestRegNoI;
-    AuxO <= AuxI;
-    --PCNextO <= PCNextI;
-    --JumpO <= JumpI;
-    --JumpRelO <= JumpRelI;
-    --JumpTargetO <= JumpTargetI;
-    --MemAccessO <= MemAccessI;
-    --MemWrEnO <= MemWrEnI;
-    --ClearO <= ClearI;
-    ImmO <= ImmI;
-    SelSrc2O <= SelSrc2I;
+    process (CLK, RST)
+    begin
+        if RST = '0' then
+            FunctO <= "000";
+            SrcData1O <= x"00000000";
+            SrcData2O <= x"00000000";
+            DestWrEnO <= '0';
+            DestRegNoO <= "00000";
+            AuxO <= '0';
+            --PCNextO <= x"00000000";
+            --JumpO <= '0';
+            --JumpRelO <= '0';
+            --JumpTargetO <= x"00000000";
+            --MemAccessO <= '0';
+            --MemWrEnO <= '0';
+            --ClearO <= '0';
+            ImmO <= x"00000000";
+            SelSrc2O <= '0';
+        elsif rising_edge(CLK) then
+            FunctO <= FunctI;
+            SrcData1O <= SrcData1I;
+            SrcData2O <= SrcData2I;
+            DestWrEnO <= DestWrEnI;
+            DestRegNoO <= DestRegNoI;
+            AuxO <= AuxI;
+            --PCNextO <= PCNextI;
+            --JumpO <= JumpI;
+            --JumpRelO <= JumpRelI;
+            --JumpTargetO <= JumpTargetI;
+            --MemAccessO <= MemAccessI;
+            --MemWrEnO <= MemWrEnI;
+            --ClearO <= ClearI;
+            ImmO <= ImmI;
+            SelSrc2O <= SelSrc2I;
+        end if;
+    end process;
+
 end Behavioral;

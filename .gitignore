@@ -12,6 +12,7 @@ hdl/syn/*.runs*
 *make_*
 *_history
 *.cf
+*.o
 
 ######################
 # GHDL

@@ -20,8 +20,15 @@ end DecodeStage;
 
 architecture Behavioral of DecodeStage is
 begin
-    InstO <= InstI;
-    --PCO <= PCI;
-    --InterlockO <= InterlockI;
-    --ClearO <= ClearI;
+    process (CLK, RST)
+    begin
+        if RST = '0' then
+            InstO <= x"00000000";
+        elsif rising_edge(CLK) then
+            InstO <= InstI;
+            --PCO <= PCI;
+            --InterlockO <= InterlockI;
+            --ClearO <= ClearI;
+        end if;
+    end process;
 end Behavioral;

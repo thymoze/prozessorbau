@@ -26,11 +26,24 @@ end MemStage;
 
 architecture Behavioral of MemStage is
 begin
-    DestDataO <= DestDataI;
-    DestWrEnO <= DestWrEnI;
-    DestRegNoO <= DestRegNoI;
-    --MemAccessO <= MemAccessI;
-    --MemRdData <= MemWrData;
-    --FunctO <= FunctI;
-    --StallO <= StallI;
+    process (CLK, RST)
+    begin
+        if RST = '0' then
+            DestDataO <= x"00000000";
+            DestWrEnO <= '0';
+            DestRegNoO <= "00000";
+            --MemAccessO <= '0';
+            --MemRdData <= x"00000000";
+            --FunctO <= "000";
+            --StallO <= '0';
+        elsif rising_edge(CLK) then
+            DestDataO <= DestDataI;
+            DestWrEnO <= DestWrEnI;
+            DestRegNoO <= DestRegNoI;
+            --MemAccessO <= MemAccessI;
+            --MemRdData <= MemWrData;
+            --FunctO <= FunctI;
+            --StallO <= StallI;
+        end if;
+    end process;
 end Behavioral;
