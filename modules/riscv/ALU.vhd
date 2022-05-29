@@ -35,7 +35,7 @@ end ALU;
 architecture Behavioral of ALU is
 
 begin
-    process (Funct, A, B, Aux)
+    process (Funct, A, B, Aux, DestRegNoI, DestWrEnI)
     begin
         case Funct is
             when funct_ADD =>

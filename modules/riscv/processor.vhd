@@ -18,6 +18,7 @@ architecture Behavioral of processor is
     signal ID_Inst : std_logic_vector (31 downto 0);
     signal ID_SrcReg1, ID_SrcReg2 : std_logic_vector(4 downto 0);
     signal ID_RegData1, ID_RegData2 : std_logic_vector(31 downto 0);
+    signal ID_FwdData1, ID_FwdData2 : std_logic_vector(31 downto 0);
     signal ID_Imm : std_logic_vector(31 downto 0);
     signal ID_SelSrc2 : std_logic;
     signal ID_Funct : std_logic_vector (2 downto 0);
@@ -35,8 +36,8 @@ architecture Behavioral of processor is
     signal EX_Aux : std_logic;
     signal EX_DestWrEn : std_logic;
     signal EX_DestRegNo : std_logic_vector(4 downto 0);
+    signal EX_DestData : std_logic_vector(31 downto 0);
 
-    signal EX_MEM_DestData : std_logic_vector(31 downto 0);
     signal EX_MEM_DestWrEn : std_logic;
     signal EX_MEM_DestRegNo : std_logic_vector(4 downto 0);
 
@@ -92,15 +93,24 @@ begin
             RdRegNo1 => ID_SrcReg1, RdRegNo2 => ID_SrcReg2,
             WrEn => MEM_DestWrEn, WrRegNo => MEM_DestRegNo, WrData => MEM_DestData,
 
-            RdData1 => ID_EX_Data1, RdData2 => ID_RegData2
+            RdData1 => ID_RegData1, RdData2 => ID_RegData2
         );
 
-    --ID_EX_Data1 <= ID_RegData1;
+    forward : entity work.Forward
+        port map(
+            SrcRegNo1 => ID_SrcReg1, SrcRegNo2 => ID_SrcReg2,
+            SrcData1 => ID_RegData1, SrcData2 => ID_RegData2,
+            DestWrEn_EX => EX_DestWrEn, DestRegNo_EX => EX_DestRegNo, DestData_EX => EX_DestData,
+            DestWrEn_MEM => MEM_DestWrEn, DestRegNo_MEM => MEM_DestRegNo, DestData_MEM => MEM_DestData,
 
+            FwdData1 => ID_EX_Data1, FwdData2 => ID_FwdData2
+        );
+
+    --ID_EX_Data1 <= ID_FwdData1;
     immOrReg : entity work.MUX
         port map(
             L => ID_Imm,
-            H => ID_RegData2,
+            H => ID_FwdData2,
             Sel => ID_SelSrc2,
             O => ID_EX_Data2
         );
@@ -134,7 +144,7 @@ begin
             Funct => EX_Funct, Aux => EX_Aux,
             DestWrEnI => EX_DestWrEn, DestRegNoI => EX_DestRegNo,
 
-            X => EX_MEM_DestData,
+            X => EX_DestData,
             DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo
         );
 
@@ -145,7 +155,7 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
-            DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_MEM_DestData,
+            DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_DestData,
 
             DestWrEnO => MEM_DestWrEn, DestRegNoO => MEM_DestRegNo, DestDataO => MEM_DestData
         );

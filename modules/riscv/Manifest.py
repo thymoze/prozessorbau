@@ -2,6 +2,7 @@ files = [
     "DecodeStage.vhd",
     "Decode.vhd",
     "RegisterSet.vhd",
+    "Forward.vhd",
 
     "ExecuteStage.vhd",
     "ALU.vhd",
