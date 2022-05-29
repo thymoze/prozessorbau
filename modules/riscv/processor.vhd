@@ -55,7 +55,7 @@ begin
             O => IF_PC
         );
 
-    imem : entity work.imem_test02fwd
+    imem : entity work.imem_Task31
         port map(
             Clock => CLK,
             address => IF_PC,

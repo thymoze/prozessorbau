@@ -40,22 +40,34 @@ begin
         opcode := Inst(6 downto 0);
 
         Funct <= funct3;
+        Aux <= Inst(30);
         SrcRegNo1 <= Inst(19 downto 15);
         SrcRegNo2 <= Inst(24 downto 20);
-        SelSrc2 <= Inst(5);
-
         Imm <= std_logic_vector(resize(signed(Inst(31 downto 20)), 32));
-
-        if (opcode = opcode_OP or opcode = opcode_OP_IMM) then
-            DestWrEn <= '1';
-        else
-            DestWrEn <= '0';
-        end if;
+        SelSrc2 <= Inst(5);
         DestRegNo <= Inst(11 downto 7);
+        DestWrEn <= '0';
 
-        Aux <= Inst(30);
-        if (funct_ADD = funct3 and opcode = opcode_OP_IMM) then
-            Aux <= '0';
-        end if;
+        case opcode is
+            when opcode_OP =>
+                DestWrEn <= '1';
+
+            when opcode_OP_IMM =>
+                if funct3 = funct_ADD then
+                    Aux <= '0';
+                end if;
+                DestWrEn <= '1';
+
+            when opcode_LUI =>
+                Funct <= "000";
+                DestWrEn <= '1';
+                SrcRegNo1 <= "00000";
+                SrcRegNo2 <= "00000";
+                SelSrc2 <= '0';
+                Aux <= '0';
+                Imm <= std_logic_vector(Inst(31 downto 12) & x"000");
+
+            when others => null;
+        end case;
     end process;
 end Behavioral;
