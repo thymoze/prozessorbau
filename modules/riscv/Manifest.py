@@ -1,7 +1,13 @@
 files = [
-    "ALU.vhd",
+    "DecodeStage.vhd",
     "Decode.vhd",
     "RegisterSet.vhd",
+
+    "ExecuteStage.vhd",
+    "ALU.vhd",
+
+    "MemStage.vhd",
+
     "constants.vhd",
     "processor.vhd"
 ]

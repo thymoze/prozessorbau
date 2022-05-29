@@ -12,8 +12,7 @@ entity Decode is
         --PC : in STD_LOGIC_VECTOR (31 downto 0);
 
         Funct : out std_logic_vector (2 downto 0);
-        SrcRegNo1 : out std_logic_vector (4 downto 0);
-        SrcRegNo2 : out std_logic_vector (4 downto 0);
+        SrcRegNo1, SrcRegNo2 : out std_logic_vector (4 downto 0);
         DestWrEn : out std_logic;
         DestRegNo : out std_logic_vector (4 downto 0);
         Aux : out std_logic;
