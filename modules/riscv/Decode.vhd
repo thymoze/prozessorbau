@@ -70,9 +70,21 @@ begin
 
             when opcode_JAL =>
                 Jump <= '1';
+                JumpRel <= '1';
                 JumpTarget <= std_logic_vector(signed(PC) + signed(Inst(31) & Inst(19 downto 12) & Inst(20) & Inst(30 downto 21) & "0"));
                 PCNext <= std_logic_vector(signed(PC) + 4);
                 DestWrEn <= '1';
+
+            when opcode_JALR =>
+                Jump <= '1';
+                JumpRel <= '0';
+                PCNext <= std_logic_vector(signed(PC) + 4);
+                DestWrEn <= '1';
+
+                SelSrc2 <= '0';
+                Funct <= funct_ADD;
+                Aux <= '0';
+                Imm <= std_logic_vector(resize(signed(Inst(31 downto 20)), 32));
 
             when others => null;
         end case;
