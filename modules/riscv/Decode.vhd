@@ -47,6 +47,7 @@ begin
         SelSrc2 <= Inst(5);
         DestRegNo <= Inst(11 downto 7);
         DestWrEn <= '0';
+        Jump <= '0';
 
         case opcode is
             when opcode_OP =>
@@ -66,6 +67,12 @@ begin
                 SelSrc2 <= '0';
                 Aux <= '0';
                 Imm <= std_logic_vector(Inst(31 downto 12) & x"000");
+
+            when opcode_JAL =>
+                Jump <= '1';
+                JumpTarget <= std_logic_vector(signed(PC) + signed(Inst(31) & Inst(19 downto 12) & Inst(20) & Inst(30 downto 21) & "0"));
+                PCNext <= std_logic_vector(signed(PC) + 4);
+                DestWrEn <= '1';
 
             when others => null;
         end case;

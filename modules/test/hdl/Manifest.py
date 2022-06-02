@@ -1,6 +1,7 @@
 files = [
     "test01.vhd",
     "test02fwd.vhd",
+    "test03jal.vhd",
 
     "Task24.vhd",
     "Task25.vhd",

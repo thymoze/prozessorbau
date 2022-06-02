@@ -71,6 +71,10 @@ begin
             when others => X <= x"40400404";
         end case;
 
+        if JumpI = '1' then
+            X <= PCNext;
+        end if;
+
         DestRegNoO <= DestRegNoI;
         DestWrEnO <= DestWrEnI;
         JumpO <= JumpI;
