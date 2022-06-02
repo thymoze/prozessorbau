@@ -85,7 +85,7 @@ begin
             ImemAddr => IF_ImemAddr
         );
 
-    imem : entity work.imem_test03jal
+    imem : entity work.imem_test04jalr
         port map(
             Clock => CLK,
             address => IF_ImemAddr,

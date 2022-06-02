@@ -48,6 +48,7 @@ begin
         DestRegNo <= Inst(11 downto 7);
         DestWrEn <= '0';
         Jump <= '0';
+        JumpRel <= '0';
 
         case opcode is
             when opcode_OP =>
@@ -85,6 +86,11 @@ begin
                 Funct <= funct_ADD;
                 Aux <= '0';
                 Imm <= std_logic_vector(resize(signed(Inst(31 downto 20)), 32));
+
+            when opcode_BRANCH =>
+                Jump <= '0';
+                JumpRel <= '1';
+                JumpTarget <= std_logic_vector(signed(PC) + signed(Inst(31) & Inst(7) & Inst(30 downto 25) & Inst(11 downto 8) & "0"));
 
             when others => null;
         end case;

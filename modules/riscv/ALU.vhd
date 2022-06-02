@@ -37,6 +37,7 @@ architecture Behavioral of ALU is
 begin
     process (Funct, A, B, Aux, DestRegNoI, DestWrEnI, JumpI, JumpTargetI, JumpRelI)
         variable result : std_logic_vector(31 downto 0);
+        variable branch_cond : boolean;
     begin
         case Funct is
             when funct_ADD =>
@@ -47,12 +48,14 @@ begin
                 end if;
 
             when funct_SLL => X <= std_logic_vector(shift_left(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
+
             when funct_SLT =>
                 if signed(A) < signed(B) then
                     result := x"00000001";
                 else
                     result := x"00000000";
                 end if;
+
             when funct_SLTU =>
                 if unsigned(A) < unsigned(B) then
                     result := x"00000001";
@@ -60,6 +63,7 @@ begin
                     result := x"00000000";
                 end if;
             when funct_XOR => X <= A xor B;
+
             when funct_SRL =>
                 if Aux = '0' then
                     result := std_logic_vector(shift_right(unsigned(A), to_integer(unsigned(B(4 downto 0)))));
@@ -68,23 +72,47 @@ begin
                 end if;
 
             when funct_OR => result := A or B;
+
             when funct_AND => result := A and B;
+
             when others => result := x"40400404";
         end case;
 
+        case Funct is
+            when funct_BEQ => branch_cond := A = B;
+            when funct_BNE => branch_cond := A /= B;
+
+            when funct_BLT => branch_cond := signed(A) < signed(B);
+            when funct_BLTU => branch_cond := unsigned(A) < unsigned(B);
+
+            when funct_BGE => branch_cond := signed(A) >= signed(B);
+            when funct_BGEU => branch_cond := unsigned(A) >= unsigned(B);
+
+            when others => branch_cond := false;
+        end case;
         X <= result;
 
+        JumpO <= JumpI;
+        JumpTargetO <= JumpTargetI;
         if JumpI = '1' then
+            -- unconditional jump
             if JumpRelI = '1' then
                 X <= PCNext;
-                JumpTargetO <= JumpTargetI;
             else
                 JumpTargetO <= result;
+            end if;
+        else
+            -- conditional jump / branch
+            if JumpRelI = '1' then
+                if branch_cond then
+                    JumpO <= '1';
+                else
+                    JumpO <= '0';
+                end if;
             end if;
         end if;
 
         DestRegNoO <= DestRegNoI;
         DestWrEnO <= DestWrEnI;
-        JumpO <= JumpI;
     end process;
 end Behavioral;
