@@ -1,6 +1,10 @@
 files = [
+    "FetchStage.vhd",
+    "Fetch.vhd",
+
     "DecodeStage.vhd",
     "Decode.vhd",
+
     "RegisterSet.vhd",
     "Forward.vhd",
 

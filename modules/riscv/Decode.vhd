@@ -7,9 +7,9 @@ use work.constants.all;
 entity Decode is
     port (
         Inst : in std_logic_vector (31 downto 0);
+        PC : in std_logic_vector (31 downto 0);
         --Clear : in STD_LOGIC;
         --InterlockI : in STD_LOGIC;
-        --PC : in STD_LOGIC_VECTOR (31 downto 0);
 
         Funct : out std_logic_vector (2 downto 0);
         SrcRegNo1, SrcRegNo2 : out std_logic_vector (4 downto 0);

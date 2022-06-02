@@ -11,11 +11,16 @@ end processor;
 
 architecture Behavioral of processor is
     -- instruction fetch
-    signal IF_PC : std_logic_vector (9 downto 0);
-    signal IF_Inst : std_logic_vector (31 downto 0);
+    signal IF_PC : std_logic_vector (31 downto 0);
+    signal IF_PCNext : std_logic_vector (31 downto 0);
+    signal IF_ImemAddr : std_logic_vector(9 downto 0);
+
+    signal IF_ID_Inst : std_logic_vector (31 downto 0);
+    signal IF_ID_PC : std_logic_vector (31 downto 0);
 
     -- instruction decode
     signal ID_Inst : std_logic_vector (31 downto 0);
+    signal ID_PC : std_logic_vector (31 downto 0);
     signal ID_SrcReg1, ID_SrcReg2 : std_logic_vector(4 downto 0);
     signal ID_RegData1, ID_RegData2 : std_logic_vector(31 downto 0);
     signal ID_FwdData1, ID_FwdData2 : std_logic_vector(31 downto 0);
@@ -27,6 +32,10 @@ architecture Behavioral of processor is
     signal ID_DestRegNo : std_logic_vector(4 downto 0);
 
     signal ID_EX_Data1, ID_EX_Data2 : std_logic_vector(31 downto 0);
+    signal ID_EX_PCNext : std_logic_vector (31 downto 0);
+    signal ID_EX_Jump : std_logic;
+    signal ID_EX_JumpRel : std_logic;
+    signal ID_EX_JumpTarget : std_logic_vector (31 downto 0);
 
     -- execute
     signal EX_Data1, EX_Data2 : std_logic_vector(31 downto 0);
@@ -37,6 +46,13 @@ architecture Behavioral of processor is
     signal EX_DestWrEn : std_logic;
     signal EX_DestRegNo : std_logic_vector(4 downto 0);
     signal EX_DestData : std_logic_vector(31 downto 0);
+    signal EX_PCNext : std_logic_vector (31 downto 0);
+    signal EX_Jump : std_logic;
+    signal EX_JumpRel : std_logic;
+    signal EX_JumpTarget : std_logic_vector (31 downto 0);
+
+    signal EX_IF_Jump : std_logic;
+    signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
 
     signal EX_MEM_DestWrEn : std_logic;
     signal EX_MEM_DestRegNo : std_logic_vector(4 downto 0);
@@ -49,17 +65,31 @@ begin
     -----------------------
     -- INSTRUCTION FETCH --
     -----------------------
-    inc : entity work.Inc10Bit
+    fetch : entity work.FetchStage
         port map(
             CLK => CLK, RST => RST,
-            O => IF_PC
+
+            PCI => IF_PCNext,
+
+            PCO => IF_PC
+        );
+
+    fetcher : entity work.Fetch
+        port map(
+            PCI => IF_PC,
+            Jump => EX_IF_Jump,
+            JumpTarget => EX_IF_JumpTarget,
+
+            PCNext => IF_PCNext,
+            PC => IF_ID_PC,
+            ImemAddr => IF_ImemAddr
         );
 
     imem : entity work.imem_Task31
         port map(
             Clock => CLK,
-            address => IF_PC,
-            q => IF_Inst
+            address => IF_ImemAddr,
+            q => IF_ID_Inst
         );
 
     ------------------------
@@ -69,21 +99,26 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
-            InstI => IF_Inst,
+            InstI => IF_ID_Inst,
+            PCI => IF_ID_PC,
 
-            InstO => ID_Inst
+            InstO => ID_Inst,
+            PCO => ID_PC
         );
 
     decoder : entity work.Decode
         port map(
             Inst => ID_Inst,
+            PC => ID_PC,
 
             Funct => ID_Funct,
             Aux => ID_Aux,
             Imm => ID_Imm,
             SrcRegNo1 => ID_SrcReg1, SrcRegNo2 => ID_SrcReg2,
             DestWrEn => ID_DestWrEn, DestRegNo => ID_DestRegNo,
-            SelSrc2 => ID_SelSrc2
+            SelSrc2 => ID_SelSrc2,
+            PCNext => ID_EX_PCNext,
+            Jump => ID_EX_Jump, JumpRel => ID_EX_JumpRel, JumpTarget => ID_EX_JumpTarget
         );
 
     regset : entity work.RegisterSet
@@ -129,13 +164,17 @@ begin
             SelSrc2I => ID_SelSrc2,
             DestWrEnI => ID_DestWrEn,
             DestRegNoI => ID_DestRegNo,
+            PCNextI => ID_EX_PCNext,
+            JumpI => ID_EX_Jump, JumpRelI => ID_EX_JumpRel, JumpTargetI => ID_EX_JumpTarget,
 
             FunctO => EX_Funct,
             AuxO => EX_Aux,
             SrcData1O => EX_Data1, SrcData2O => EX_Data2,
             ImmO => EX_Imm,
             SelSrc2O => EX_SelSrc2,
-            DestWrEnO => EX_DestWrEn, DestRegNoO => EX_DestRegNo
+            DestWrEnO => EX_DestWrEn, DestRegNoO => EX_DestRegNo,
+            PCNextO => EX_PCNext,
+            JumpO => EX_Jump, JumpRelO => EX_JumpRel, JumpTargetO => EX_JumpTarget
         );
 
     alu : entity work.ALU
@@ -143,9 +182,12 @@ begin
             A => EX_Data1, B => EX_Data2,
             Funct => EX_Funct, Aux => EX_Aux,
             DestWrEnI => EX_DestWrEn, DestRegNoI => EX_DestRegNo,
+            PCNext => EX_PCNext,
+            JumpI => EX_Jump, JumpRelI => EX_JumpRel, JumpTargetI => EX_JumpTarget,
 
             X => EX_DestData,
-            DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo
+            DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo,
+            JumpO => EX_IF_Jump, JumpTargetO => EX_IF_JumpTarget
         );
 
     --

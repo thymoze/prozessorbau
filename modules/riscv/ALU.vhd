@@ -10,10 +10,10 @@ entity ALU is
         B : in std_logic_vector(31 downto 0);
         Funct : in std_logic_vector (2 downto 0);
         Aux : in std_logic;
-        --PCNext: in std_logic_vector(31 downto 0);
-        --JumpI: in std_logic;
-        --JumpRel: in std_logic;
-        --JumpTargetI: in std_logic_vector(31 downto 0);
+        PCNext : in std_logic_vector(31 downto 0);
+        JumpI : in std_logic;
+        JumpRelI : in std_logic;
+        JumpTargetI : in std_logic_vector(31 downto 0);
         --MemAccessI: in std_logic;
         --SrcData2: in std_logic_vector(31 downto 0);
         DestRegNoI : in std_logic_vector(4 downto 0);
@@ -35,7 +35,7 @@ end ALU;
 architecture Behavioral of ALU is
 
 begin
-    process (Funct, A, B, Aux, DestRegNoI, DestWrEnI)
+    process (Funct, A, B, Aux, DestRegNoI, DestWrEnI, JumpI, JumpTargetI, JumpRelI)
     begin
         case Funct is
             when funct_ADD =>
@@ -73,5 +73,7 @@ begin
 
         DestRegNoO <= DestRegNoI;
         DestWrEnO <= DestWrEnI;
+        JumpO <= JumpI;
+        JumpTargetO <= JumpTargetI;
     end process;
 end Behavioral;
