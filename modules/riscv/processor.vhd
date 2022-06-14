@@ -90,7 +90,7 @@ begin
             ImemAddr => IF_ImemAddr
         );
 
-    imem : entity work.imem_test05branch
+    imem : entity work.imem_Task37
         port map(
             Clock => CLK,
             address => IF_ImemAddr,

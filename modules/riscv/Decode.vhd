@@ -69,6 +69,15 @@ begin
                 Aux <= '0';
                 Imm <= std_logic_vector(Inst(31 downto 12) & x"000");
 
+            when opcode_AUIPC =>
+                Funct <= "000";
+                DestWrEn <= '1';
+                SrcRegNo1 <= "00000";
+                SrcRegNo2 <= "00000";
+                SelSrc2 <= '0';
+                Aux <= '0';
+                Imm <= std_logic_vector(signed(PC) + signed(Inst(31 downto 12) & x"000"));
+
             when opcode_JAL =>
                 Jump <= '1';
                 JumpRel <= '1';
