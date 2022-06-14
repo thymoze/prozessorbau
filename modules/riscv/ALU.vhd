@@ -96,9 +96,8 @@ begin
         JumpTargetO <= JumpTargetI;
         if JumpI = '1' then
             -- unconditional jump
-            if JumpRelI = '1' then
-                X <= PCNext;
-            else
+            X <= PCNext;
+            if JumpRelI = '0' then
                 JumpTargetO <= result;
             end if;
         else
