@@ -18,7 +18,7 @@ entity ALU is
         --SrcData2: in std_logic_vector(31 downto 0);
         DestRegNoI : in std_logic_vector(4 downto 0);
         DestWrEnI : in std_logic;
-        --Clear: in std_logic;
+        Clear : in std_logic;
         --Stall: in std_logic;
 
         X : out std_logic_vector(31 downto 0);
@@ -113,5 +113,10 @@ begin
 
         DestRegNoO <= DestRegNoI;
         DestWrEnO <= DestWrEnI;
+
+        if Clear = '1' then
+            DestWrEnO <= '0';
+            JumpO <= '0';
+        end if;
     end process;
 end Behavioral;

@@ -8,7 +8,7 @@ entity Decode is
     port (
         Inst : in std_logic_vector (31 downto 0);
         PC : in std_logic_vector (31 downto 0);
-        --Clear : in STD_LOGIC;
+        Clear : in std_logic;
         --InterlockI : in STD_LOGIC;
 
         Funct : out std_logic_vector (2 downto 0);
@@ -94,5 +94,11 @@ begin
 
             when others => null;
         end case;
+
+        if Clear = '1' then
+            DestWrEn <= '0';
+            Jump <= '0';
+            JumpRel <= '0';
+        end if;
     end process;
 end Behavioral;

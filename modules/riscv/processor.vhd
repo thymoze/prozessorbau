@@ -30,6 +30,7 @@ architecture Behavioral of processor is
     signal ID_Aux : std_logic;
     signal ID_DestWrEn : std_logic;
     signal ID_DestRegNo : std_logic_vector(4 downto 0);
+    signal ID_Clear : std_logic;
 
     signal ID_EX_Data1, ID_EX_Data2 : std_logic_vector(31 downto 0);
     signal ID_EX_PCNext : std_logic_vector (31 downto 0);
@@ -48,11 +49,15 @@ architecture Behavioral of processor is
     signal EX_DestData : std_logic_vector(31 downto 0);
     signal EX_PCNext : std_logic_vector (31 downto 0);
     signal EX_Jump : std_logic;
+    signal EX_JumpO : std_logic;
     signal EX_JumpRel : std_logic;
     signal EX_JumpTarget : std_logic_vector (31 downto 0);
+    signal EX_Clear : std_logic;
 
     signal EX_IF_Jump : std_logic;
     signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
+
+    signal EX_ID_Jump : std_logic;
 
     signal EX_MEM_DestWrEn : std_logic;
     signal EX_MEM_DestRegNo : std_logic_vector(4 downto 0);
@@ -85,7 +90,7 @@ begin
             ImemAddr => IF_ImemAddr
         );
 
-    imem : entity work.imem_test04jalr
+    imem : entity work.imem_test05branch
         port map(
             Clock => CLK,
             address => IF_ImemAddr,
@@ -101,15 +106,18 @@ begin
 
             InstI => IF_ID_Inst,
             PCI => IF_ID_PC,
+            ClearI => EX_ID_Jump,
 
             InstO => ID_Inst,
-            PCO => ID_PC
+            PCO => ID_PC,
+            ClearO => ID_Clear
         );
 
     decoder : entity work.Decode
         port map(
             Inst => ID_Inst,
             PC => ID_PC,
+            Clear => ID_Clear,
 
             Funct => ID_Funct,
             Aux => ID_Aux,
@@ -166,6 +174,7 @@ begin
             DestRegNoI => ID_DestRegNo,
             PCNextI => ID_EX_PCNext,
             JumpI => ID_EX_Jump, JumpRelI => ID_EX_JumpRel, JumpTargetI => ID_EX_JumpTarget,
+            ClearI => EX_JumpO,
 
             FunctO => EX_Funct,
             AuxO => EX_Aux,
@@ -174,7 +183,8 @@ begin
             SelSrc2O => EX_SelSrc2,
             DestWrEnO => EX_DestWrEn, DestRegNoO => EX_DestRegNo,
             PCNextO => EX_PCNext,
-            JumpO => EX_Jump, JumpRelO => EX_JumpRel, JumpTargetO => EX_JumpTarget
+            JumpO => EX_Jump, JumpRelO => EX_JumpRel, JumpTargetO => EX_JumpTarget,
+            ClearO => EX_Clear
         );
 
     alu : entity work.ALU
@@ -184,11 +194,15 @@ begin
             DestWrEnI => EX_DestWrEn, DestRegNoI => EX_DestRegNo,
             PCNext => EX_PCNext,
             JumpI => EX_Jump, JumpRelI => EX_JumpRel, JumpTargetI => EX_JumpTarget,
+            Clear => EX_Clear,
 
             X => EX_DestData,
             DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo,
-            JumpO => EX_IF_Jump, JumpTargetO => EX_IF_JumpTarget
+            JumpO => EX_JumpO, JumpTargetO => EX_IF_JumpTarget
         );
+
+    EX_IF_Jump <= EX_JumpO;
+    EX_ID_Jump <= EX_JumpO;
 
     --
     -- MEM
