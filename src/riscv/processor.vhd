@@ -73,12 +73,20 @@ architecture Behavioral of processor is
     signal EX_MEM_ByteEna : std_logic_vector (3 downto 0);
 
     -- mem
+    signal MEM_Funct : std_logic_vector (2 downto 0);
+    signal MEM_Stall : std_logic;
     signal MEM_DestData : std_logic_vector (31 downto 0);
     signal MEM_DestWrEn : std_logic;
     signal MEM_DestRegNo : std_logic_vector (4 downto 0);
     signal MEM_MemData : std_logic_vector (31 downto 0);
     signal MEM_MemAccess : std_logic;
-    signal MEM_Funct : std_logic_vector (2 downto 0);
+    signal MEM_RamReadEn : std_logic;
+    signal MEM_RamWriteEn : std_logic;
+    signal MEM_RamByteEna : std_logic_vector (3 downto 0);
+    signal MEM_RamAddress : std_logic_vector (31 downto 0);
+    signal MEM_RamWrData : std_logic_vector (31 downto 0);
+    signal MEM_RamRdData : std_logic_vector (31 downto 0);
+    signal MEM_RamBusy : std_logic;
 
     signal MEM_ID_WrData : std_logic_vector (31 downto 0);
 
@@ -101,6 +109,7 @@ begin
             Jump => EX_IF_Jump,
             JumpTarget => EX_IF_JumpTarget,
             InterlockI => ID_IF_Interlock,
+            Stall => MEM_Stall,
 
             PCNext => IF_PCNext,
             PC => IF_ID_PC,
@@ -125,6 +134,7 @@ begin
             PCI => IF_ID_PC,
             ClearI => EX_ID_Jump,
             InterlockI => ID_IF_Interlock,
+            Stall => MEM_Stall,
 
             InstO => ID_Inst,
             PCO => ID_PC,
@@ -179,6 +189,7 @@ begin
             CLK => CLK, RST => RST,
 
             FunctI => ID_Funct,
+            Stall => MEM_Stall,
             AuxI => ID_Aux,
             SrcData1I => ID_EX_Data1, SrcData2I => ID_EX_Data2,
             ImmI => ID_Imm,
@@ -237,13 +248,41 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
+            StallI => MEM_Stall,
             FunctI => EX_MEM_Funct,
             DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_DestData,
             MemWrData => EX_MEM_WrData, MemAccessI => EX_MEM_Access, MemByteEna => EX_MEM_ByteEna,
+            RamRdData => MEM_RamRdData,
+            RamBusy => MEM_RamBusy,
 
             DestWrEnO => MEM_DestWrEn, DestRegNoO => MEM_DestRegNo, DestDataO => MEM_DestData,
             MemAccessO => MEM_MemAccess,
-            FunctO => MEM_Funct
+            RamReadEn => MEM_RamReadEn, RamWriteEn => MEM_RamWriteEn, RamByteEna => MEM_RamByteEna,
+            RamAddress => MEM_RamAddress, RamWrData => MEM_RamWrData,
+            FunctO => MEM_Funct,
+            StallO => MEM_Stall
+        );
+
+    axi : entity work.AXI_Mem_Interface
+        port map(
+            M_AXI_aclk => CLK, M_AXI_aresetn => RST,
+
+            ReadEn => MEM_RamReadEn,
+            WriteEn => MEM_RamWriteEn,
+            WrByteEna => MEM_RamByteEna,
+            Address => MEM_RamAddress,
+            DataIn => MEM_RamWrData,
+            M_AXI_awready => '-',
+            M_AXI_wready => '-',
+            M_AXI_bresp => (others => '-'),
+            M_AXI_bvalid => '-',
+            M_AXI_arready => '-',
+            M_AXI_rdata => (others => '-'),
+            M_AXI_rresp => (others => '-'),
+            M_AXI_rvalid => '-',
+
+            DataOut => MEM_RamRdData,
+            busy => MEM_RamBusy
         );
 
     memory : entity work.memory

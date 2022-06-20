@@ -9,7 +9,7 @@ entity DecodeStage is
         PCI : in std_logic_vector (31 downto 0);
         InterlockI : in std_logic;
         ClearI : in std_logic;
-        --Stall : in std_logic;
+        Stall : in std_logic;
 
         InstO : out std_logic_vector (31 downto 0);
         PCO : out std_logic_vector (31 downto 0);
@@ -27,7 +27,7 @@ begin
             PCO <= x"00000000";
             InterlockO <= '0';
             ClearO <= '0';
-        elsif rising_edge(CLK) then
+        elsif rising_edge(CLK) and Stall = '0' then
             InstO <= InstI;
             PCO <= PCI;
             InterlockO <= InterlockI;

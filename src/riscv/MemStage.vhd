@@ -11,16 +11,23 @@ entity MemStage is
         MemAccessI : in std_logic;
         MemWrData : in std_logic_vector(31 downto 0);
         MemByteEna : in std_logic_vector(3 downto 0);
+        RamRdData : in std_logic_vector(31 downto 0);
+        RamBusy : in std_logic;
         FunctI : in std_logic_vector(2 downto 0);
-        --StallI : in std_logic;
+        StallI : in std_logic;
 
         DestDataO : out std_logic_vector(31 downto 0);
         DestWrEnO : out std_logic;
         DestRegNoO : out std_logic_vector(4 downto 0);
         MemAccessO : out std_logic;
         --MemRdData : out std_logic_vector(31 downto 0);
-        FunctO : out std_logic_vector(2 downto 0)
-        --StallO : out std_logic
+        RamReadEn : out std_logic;
+        RamWriteEn : out std_logic;
+        RamByteEna : out std_logic_vector(3 downto 0);
+        RamAddress : out std_logic_vector(31 downto 0);
+        RamWrData : out std_logic_vector(31 downto 0);
+        FunctO : out std_logic_vector(2 downto 0);
+        StallO : out std_logic
     );
 end MemStage;
 
@@ -34,16 +41,21 @@ begin
             DestRegNoO <= "00000";
             MemAccessO <= '0';
             --MemRdData <= x"00000000";
+
+            RamReadEn <= '0';
+            RamWriteEn <= '0';
+
             FunctO <= "000";
-            --StallO <= '0';
-        elsif rising_edge(CLK) then
+            StallO <= '0';
+        elsif rising_edge(CLK) and StallI = '0' then
             DestDataO <= DestDataI;
             DestWrEnO <= DestWrEnI;
             DestRegNoO <= DestRegNoI;
             MemAccessO <= MemAccessI;
             --MemRdData <= MemWrData;
+
             FunctO <= FunctI;
-            --StallO <= StallI;
+            StallO <= StallI;
         end if;
     end process;
 end Behavioral;

@@ -10,7 +10,7 @@ entity Fetch is
         Jump : in std_logic;
         JumpTarget : in std_logic_vector (31 downto 0);
         InterlockI : in std_logic;
-        --Stall : in std_logic;
+        Stall : in std_logic;
 
         PCNext : out std_logic_vector(31 downto 0);
         PC : out std_logic_vector(31 downto 0);
@@ -21,7 +21,7 @@ end Fetch;
 architecture Behavioral of Fetch is
 
 begin
-    process (PCI, Jump, JumpTarget, InterlockI)
+    process (PCI, Jump, JumpTarget, InterlockI, Stall)
         variable pc_next : std_logic_vector (31 downto 0);
     begin
         if Jump = '1' then
@@ -35,7 +35,10 @@ begin
         end if;
 
         PC <= PCI;
-        PCNext <= pc_next;
-        ImemAddr <= pc_next(11 downto 2);
+
+        if Stall = '0' then
+            PCNext <= pc_next;
+            ImemAddr <= pc_next(11 downto 2);
+        end if;
     end process;
 end Behavioral;

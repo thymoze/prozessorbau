@@ -20,7 +20,6 @@ entity ALU is
         DestRegNoI : in std_logic_vector(4 downto 0);
         DestWrEnI : in std_logic;
         Clear : in std_logic;
-        --Stall: in std_logic;
 
         FunctO : out std_logic_vector (2 downto 0);
         X : out std_logic_vector(31 downto 0);

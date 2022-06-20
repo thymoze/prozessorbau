@@ -19,7 +19,7 @@ entity ExecuteStage is
         ClearI : in std_logic;
         ImmI : in std_logic_vector(31 downto 0);
         SelSrc2I : in std_logic;
-        --Stall : in std_logic;
+        Stall : in std_logic;
 
         FunctO : out std_logic_vector (2 downto 0);
         SrcData1O, SrcData2O : out std_logic_vector (31 downto 0);
@@ -58,7 +58,7 @@ begin
             ClearO <= '0';
             ImmO <= x"00000000";
             SelSrc2O <= '0';
-        elsif rising_edge(CLK) then
+        elsif rising_edge(CLK) and Stall = '0' then
             FunctO <= FunctI;
             SrcData1O <= SrcData1I;
             SrcData2O <= SrcData2I;
