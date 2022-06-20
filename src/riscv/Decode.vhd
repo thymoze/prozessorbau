@@ -9,7 +9,7 @@ entity Decode is
         Inst : in std_logic_vector (31 downto 0);
         PC : in std_logic_vector (31 downto 0);
         Clear : in std_logic;
-        --InterlockI : in STD_LOGIC;
+        InterlockI : in std_logic;
 
         Funct : out std_logic_vector (2 downto 0);
         SrcRegNo1, SrcRegNo2 : out std_logic_vector (4 downto 0);
@@ -32,7 +32,7 @@ end Decode;
 architecture Behavioral of Decode is
 
 begin
-    process (Inst)
+    process (Inst, PC, Clear, InterlockI)
         variable opcode : std_logic_vector (6 downto 0);
         variable funct3 : std_logic_vector (2 downto 0);
     begin
@@ -51,6 +51,7 @@ begin
         JumpRel <= '0';
         MemAccess <= '0';
         MemWrEn <= '0';
+        InterlockO <= '0';
 
         case opcode is
             when opcode_OP =>
@@ -108,6 +109,7 @@ begin
                 MemWrEn <= '0';
                 DestWrEn <= '1';
                 SelSrc2 <= '0';
+                InterlockO <= '1';
 
             when opcode_STORE =>
                 MemAccess <= '1';
@@ -120,7 +122,10 @@ begin
             when others => null;
         end case;
 
-        if Clear = '1' then
+        if Clear = '1' or InterlockI = '1' then
+            InterlockO <= '0';
+            MemAccess <= '0';
+            MemWrEn <= '0';
             DestWrEn <= '0';
             Jump <= '0';
             JumpRel <= '0';

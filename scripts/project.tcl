@@ -9,7 +9,7 @@ read_vhdl [glob -join -dir [file join $baseDir ../src/] * *.vhd]
 read_vhdl [glob -join -dir [file join $baseDir ../src/test_files] hdl *.vhd]
 read_vhdl [glob -join -dir [file join $baseDir ../testbench] * *.vhd]
 read_vhdl [glob -join -dir [file join $baseDir ../top] *.vhd]
-read_xdc [file join $baseDir ../src/top/zedboard.xdc]
+read_xdc [file join $baseDir ../top/zedboard.xdc]
 
 source [file join $baseDir ip.tcl]
 

@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity imem_Task27 is 
+entity imem_Task27 is
     port (
         address : in std_logic_vector (9 downto 0);
         Clock   : in std_logic;
@@ -12,7 +12,7 @@ entity imem_Task27 is
 end imem_Task27;
 
 architecture SYN of imem_Task27 is
-    type TMem is array (0 to 1024) of std_logic_vector (31 downto 0);
+    type TMem is array (0 to 1023) of std_logic_vector (31 downto 0);
     signal Mem : TMem := (
       x"00f00613",
       x"40265613",

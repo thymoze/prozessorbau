@@ -30,6 +30,9 @@ architecture Behavioral of processor is
     signal ID_DestWrEn : std_logic;
     signal ID_DestRegNo : std_logic_vector(4 downto 0);
     signal ID_Clear : std_logic;
+    signal ID_Interlock : std_logic;
+
+    signal ID_IF_Interlock : std_logic;
 
     signal ID_EX_Data1, ID_EX_Data2 : std_logic_vector(31 downto 0);
     signal ID_EX_PCNext : std_logic_vector (31 downto 0);
@@ -62,6 +65,7 @@ architecture Behavioral of processor is
 
     signal EX_ID_Jump : std_logic;
 
+    signal EX_MEM_Funct : std_logic_vector (2 downto 0);
     signal EX_MEM_DestWrEn : std_logic;
     signal EX_MEM_DestRegNo : std_logic_vector (4 downto 0);
     signal EX_MEM_WrData : std_logic_vector (31 downto 0);
@@ -96,6 +100,7 @@ begin
             PCI => IF_PC,
             Jump => EX_IF_Jump,
             JumpTarget => EX_IF_JumpTarget,
+            InterlockI => ID_IF_Interlock,
 
             PCNext => IF_PCNext,
             PC => IF_ID_PC,
@@ -119,10 +124,12 @@ begin
             InstI => IF_ID_Inst,
             PCI => IF_ID_PC,
             ClearI => EX_ID_Jump,
+            InterlockI => ID_IF_Interlock,
 
             InstO => ID_Inst,
             PCO => ID_PC,
-            ClearO => ID_Clear
+            ClearO => ID_Clear,
+            InterlockO => ID_Interlock
         );
 
     decoder : entity work.Decode
@@ -130,6 +137,7 @@ begin
             Inst => ID_Inst,
             PC => ID_PC,
             Clear => ID_Clear,
+            InterlockI => ID_Interlock,
 
             Funct => ID_Funct,
             Aux => ID_Aux,
@@ -139,7 +147,8 @@ begin
             SelSrc2 => ID_SelSrc2,
             PCNext => ID_EX_PCNext,
             Jump => ID_EX_Jump, JumpRel => ID_EX_JumpRel, JumpTarget => ID_EX_JumpTarget,
-            MemAccess => ID_EX_MemAccess, MemWrEn => ID_EX_MemWrEn
+            MemAccess => ID_EX_MemAccess, MemWrEn => ID_EX_MemWrEn,
+            InterlockO => ID_IF_Interlock
         );
 
     regset : entity work.RegisterSet
@@ -204,7 +213,7 @@ begin
         port map(
             A => EX_SrcData1, B => EX_Data2,
             SrcData2 => EX_SrcData2,
-            Funct => EX_Funct, Aux => EX_Aux,
+            FunctI => EX_Funct, Aux => EX_Aux,
             DestWrEnI => EX_DestWrEn, DestRegNoI => EX_DestRegNo,
             MemAccessI => EX_MemAccess, MemWrEn => EX_MemWrEn,
             PCNext => EX_PCNext,
@@ -212,6 +221,7 @@ begin
             Clear => EX_Clear,
 
             X => EX_DestData,
+            FunctO => EX_MEM_Funct,
             DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo,
             JumpO => EX_JumpO, JumpTargetO => EX_IF_JumpTarget,
             MemWrData => EX_MEM_WrData, MemAccessO => EX_MEM_Access, MemByteEna => EX_MEM_ByteEna
@@ -227,6 +237,7 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
+            FunctI => EX_MEM_Funct,
             DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_DestData,
             MemWrData => EX_MEM_WrData, MemAccessI => EX_MEM_Access, MemByteEna => EX_MEM_ByteEna,
 
@@ -252,7 +263,7 @@ begin
             MemDataIn => MEM_MemData,
             Sel => MEM_MemAccess,
             FunctI => MEM_Funct,
-            
+
             WrData => MEM_ID_WrData
         );
 end Behavioral;

@@ -1,4 +1,5 @@
 variable ipDir [file join [file dirname [file normalize [info script]]] ip]
+file mkdir $ipDir
 
 proc load_ip {name} {
     if { [file isdirectory [file join $::ipDir $name]] } {
@@ -20,7 +21,7 @@ if { ![load_ip memory] } {
         CONFIG.Write_Width_B {32} \
         CONFIG.Read_Width_B {32} \
         CONFIG.Register_PortA_Output_of_Memory_Primitives {false} \
-    ] [get_ips memory]
+        ] [get_ips memory]
 }
 
 generate_target all [get_ips]

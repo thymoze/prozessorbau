@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$1" == "" ] 
-then 
+if [ "$1" == "" ]
+then
     echo "Usage: $0 <input> <?output>"
     exit
 fi
@@ -23,7 +23,7 @@ readarray -t instructions < <(riscv64-unknown-elf-objdump -d "${output}.o" | awk
 rm "${output}.o"
 
 name="imem_${output_basename// /_}"
-total=1024
+total=1023
 remainder=$((total - ${#instructions[@]}))
 
 cat > "${output}.vhd" << EOF
@@ -31,7 +31,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity ${name} is 
+entity ${name} is
     port (
         address : in std_logic_vector (9 downto 0);
         Clock   : in std_logic;
@@ -44,7 +44,7 @@ architecture SYN of ${name} is
     type TMem is array (0 to ${total}) of std_logic_vector (31 downto 0);
     signal Mem : TMem := (
 $(printf "      x\"%s\",\n" ${instructions[@]})
-$(for i in $(eval echo "{2..${remainder}}"); do echo "      x\"00000000\","; done)
+$(for i in $(eval echo "{1..${remainder}}"); do echo "      x\"00000000\","; done)
       x"00000000"
     );
 begin

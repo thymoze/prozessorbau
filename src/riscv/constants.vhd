@@ -35,4 +35,13 @@ PACKAGE constants IS
   constant funct_OR       : std_logic_vector(2 downto 0) := "110";
   constant funct_AND      : std_logic_vector(2 downto 0) := "111";
 
+  constant funct_SB       : std_logic_vector(2 downto 0) := "000";
+  constant funct_SH       : std_logic_vector(2 downto 0) := "001";
+  constant funct_SW       : std_logic_vector(2 downto 0) := "010";
+
+  constant funct_LB       : std_logic_vector(2 downto 0) := "000";
+  constant funct_LBU      : std_logic_vector(2 downto 0) := "100";
+  constant funct_LH       : std_logic_vector(2 downto 0) := "001";
+  constant funct_LHU      : std_logic_vector(2 downto 0) := "101";
+  constant funct_LW       : std_logic_vector(2 downto 0) := "010";
 END constants;

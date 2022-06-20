@@ -11,7 +11,7 @@ entity MemStage is
         MemAccessI : in std_logic;
         MemWrData : in std_logic_vector(31 downto 0);
         MemByteEna : in std_logic_vector(3 downto 0);
-        --FunctI : in std_logic_vector(2 downto 0);
+        FunctI : in std_logic_vector(2 downto 0);
         --StallI : in std_logic;
 
         DestDataO : out std_logic_vector(31 downto 0);
@@ -42,7 +42,7 @@ begin
             DestRegNoO <= DestRegNoI;
             MemAccessO <= MemAccessI;
             --MemRdData <= MemWrData;
-            --FunctO <= FunctI;
+            FunctO <= FunctI;
             --StallO <= StallI;
         end if;
     end process;
