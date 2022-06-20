@@ -20,7 +20,7 @@ entity MemStage is
         DestWrEnO : out std_logic;
         DestRegNoO : out std_logic_vector(4 downto 0);
         MemAccessO : out std_logic;
-        --MemRdData : out std_logic_vector(31 downto 0);
+        MemRdData : out std_logic_vector(31 downto 0);
         RamReadEn : out std_logic;
         RamWriteEn : out std_logic;
         RamByteEna : out std_logic_vector(3 downto 0);
@@ -32,7 +32,7 @@ entity MemStage is
 end MemStage;
 
 architecture Behavioral of MemStage is
-    type state_type is (Idle, Stalled);
+    type state_type is (Idle, Read, Write);
     signal current_state : state_type;
 begin
     process (CLK, RST)
@@ -42,7 +42,7 @@ begin
             DestWrEnO <= '0';
             DestRegNoO <= "00000";
             MemAccessO <= '0';
-            --MemRdData <= x"00000000";
+            MemRdData <= x"00000000";
 
             RamReadEn <= '0';
             RamWriteEn <= '0';
@@ -57,7 +57,6 @@ begin
                 DestWrEnO <= DestWrEnI;
                 DestRegNoO <= DestRegNoI;
                 MemAccessO <= MemAccessI;
-                --MemRdData <= MemWrData;
 
                 FunctO <= FunctI;
                 StallO <= StallI;
@@ -65,12 +64,36 @@ begin
 
             case current_state is
                 when Idle =>
-                    StallO <= '1';
-                    current_state <= Stalled;
+                    MemRdData <= (others => '0');
+                    if MemAccessI = '1' then
+                        RamAddress <= DestDataI(31 downto 2) & b"00"; -- set lowest two bits to 0 to ensure alignment
+                        StallO <= '1';
 
-                when Stalled =>
-                    StallO <= '0';
-                    current_state <= Idle;
+                        if MemByteEna = "0000" then
+                            current_state <= Read;
+                            RamReadEn <= '1';
+                        else
+                            current_state <= Write;
+                            RamWriteEn <= '1';
+                            RamByteEna <= MemByteEna;
+                            RamWrData <= MemWrData;
+                        end if;
+                    end if;
+
+                when Read =>
+                    RamReadEn <= '0';
+                    if RamBusy = '0' then
+                        StallO <= '0';
+                        current_state <= Idle;
+                        MemRdData <= RamRdData;
+                    end if;
+
+                when Write =>
+                    RamWriteEn <= '0';
+                    if RamBusy = '0' then
+                        StallO <= '0';
+                        current_state <= Idle;
+                    end if;
             end case;
         end if;
     end process;
