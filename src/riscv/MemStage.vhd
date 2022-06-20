@@ -32,6 +32,8 @@ entity MemStage is
 end MemStage;
 
 architecture Behavioral of MemStage is
+    type state_type is (Idle, Stalled);
+    signal current_state : state_type;
 begin
     process (CLK, RST)
     begin
@@ -47,15 +49,29 @@ begin
 
             FunctO <= "000";
             StallO <= '0';
-        elsif rising_edge(CLK) and StallI = '0' then
-            DestDataO <= DestDataI;
-            DestWrEnO <= DestWrEnI;
-            DestRegNoO <= DestRegNoI;
-            MemAccessO <= MemAccessI;
-            --MemRdData <= MemWrData;
 
-            FunctO <= FunctI;
-            StallO <= StallI;
+            current_state <= Idle;
+        elsif rising_edge(CLK) then
+            if StallI = '0' then
+                DestDataO <= DestDataI;
+                DestWrEnO <= DestWrEnI;
+                DestRegNoO <= DestRegNoI;
+                MemAccessO <= MemAccessI;
+                --MemRdData <= MemWrData;
+
+                FunctO <= FunctI;
+                StallO <= StallI;
+            end if;
+
+            case current_state is
+                when Idle =>
+                    StallO <= '1';
+                    current_state <= Stalled;
+
+                when Stalled =>
+                    StallO <= '0';
+                    current_state <= Idle;
+            end case;
         end if;
     end process;
 end Behavioral;
