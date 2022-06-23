@@ -18,6 +18,8 @@ architecture Behavioral of processor is
     signal IF_ID_Inst : std_logic_vector (31 downto 0);
     signal IF_ID_PC : std_logic_vector (31 downto 0);
 
+    signal IF_MEM_ROMDataIn : std_logic_vector (31 downto 0);
+
     -- instruction decode
     signal ID_Inst : std_logic_vector (31 downto 0);
     signal ID_PC : std_logic_vector (31 downto 0);
@@ -62,6 +64,7 @@ architecture Behavioral of processor is
 
     signal EX_IF_Jump : std_logic;
     signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
+    signal EX_IF_MemAccess : std_logic;
 
     signal EX_ID_Jump : std_logic;
 
@@ -69,7 +72,7 @@ architecture Behavioral of processor is
     signal EX_MEM_DestWrEn : std_logic;
     signal EX_MEM_DestRegNo : std_logic_vector (4 downto 0);
     signal EX_MEM_WrData : std_logic_vector (31 downto 0);
-    signal EX_MEM_Access : std_logic;
+    signal EX_MEM_MemAccess : std_logic;
     signal EX_MEM_ByteEna : std_logic_vector (3 downto 0);
 
     -- mem
@@ -143,11 +146,16 @@ begin
             ImemAddr => IF_ImemAddr
         );
 
-    imem : entity work.imem_test06mem
+    imem : entity work.imemory
         port map(
-            Clock => CLK,
-            address => IF_ImemAddr,
-            q => IF_ID_Inst
+            clka => CLK, clkb => CLK,
+
+            addra => EX_DestData(11 downto 2),
+            addrb => IF_ImemAddr,
+            ena => EX_IF_MemAccess,
+
+            douta => IF_MEM_ROMDataIn,
+            doutb => IF_ID_Inst
         );
 
     ------------------------
@@ -262,10 +270,12 @@ begin
             FunctO => EX_MEM_Funct,
             DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo,
             JumpO => EX_JumpO, JumpTargetO => EX_IF_JumpTarget,
-            MemWrData => EX_MEM_WrData, MemAccessO => EX_MEM_Access, MemByteEna => EX_MEM_ByteEna
+            MemWrData => EX_MEM_WrData, MemAccessO => EX_MEM_MemAccess, MemByteEna => EX_MEM_ByteEna
         );
 
     EX_IF_Jump <= EX_JumpO;
+    EX_IF_MemAccess <= EX_MEM_MemAccess;
+
     EX_ID_Jump <= EX_JumpO;
 
     --
@@ -278,7 +288,7 @@ begin
             StallI => MEM_Stall,
             FunctI => EX_MEM_Funct,
             DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_DestData,
-            MemWrData => EX_MEM_WrData, MemAccessI => EX_MEM_Access, MemByteEna => EX_MEM_ByteEna,
+            MemWrData => EX_MEM_WrData, MemAccessI => EX_MEM_MemAccess, MemByteEna => EX_MEM_ByteEna,
             RamRdData => MEM_RamRdData,
             RamBusy => MEM_RamBusy,
 
@@ -376,6 +386,7 @@ begin
             MemDataIn => MEM_MemData,
             Sel => MEM_MemAccess,
             FunctI => MEM_Funct,
+            ROMDataIn => IF_MEM_ROMDataIn,
 
             WrData => MEM_ID_WrData
         );

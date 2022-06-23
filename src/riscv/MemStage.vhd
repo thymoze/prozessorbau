@@ -65,7 +65,8 @@ begin
             case current_state is
                 when Idle =>
                     MemRdData <= (others => '0');
-                    if MemAccessI = '1' then
+                    -- addresses < x1000 go to the rom, not the ram, and complete in 1 cycle
+                    if MemAccessI = '1' and DestDataI >= x"1000" then
                         RamAddress <= DestDataI(31 downto 2) & b"00"; -- set lowest two bits to 0 to ensure alignment
                         StallO <= '1';
 

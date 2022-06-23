@@ -1,4 +1,5 @@
-variable ipDir [file join [file dirname [file normalize [info script]]] ip]
+variable baseDir [file join [file dirname [file normalize [info script]]] ../]
+variable ipDir [file join $baseDir scripts ip]
 file mkdir $ipDir
 
 proc load_ip {name} {
@@ -26,6 +27,28 @@ if { ![load_ip memory] } {
         CONFIG.Use_RSTA_Pin {true} \
         CONFIG.EN_SAFETY_CKT {true} \
         ] [get_ips memory]
+}
+
+if { ![load_ip imemory] } {
+    create_ip -name blk_mem_gen -vendor xilinx.com -library ip -version 8.4 -module_name imemory
+    set_property -dict [list \
+        CONFIG.Component_Name {imemory} \
+        CONFIG.Memory_Type {Dual_Port_ROM} \
+        CONFIG.Write_Width_A {32} \
+        CONFIG.Write_Depth_A {1024} \
+        CONFIG.Read_Width_A {32} \
+        CONFIG.Enable_A {Use_ENA_Pin} \
+        CONFIG.Write_Width_B {32} \
+        CONFIG.Read_Width_B {32} \
+        CONFIG.Enable_B {Always_Enabled} \
+        CONFIG.Register_PortA_Output_of_Memory_Primitives {false} \
+        CONFIG.Register_PortB_Output_of_Memory_Primitives {false} \
+        CONFIG.Port_A_Write_Rate {0} \
+        CONFIG.Port_B_Clock {100} \
+        CONFIG.Port_B_Enable_Rate {100} \
+        CONFIG.Load_Init_File {true} \
+        CONFIG.Coe_File { [ file join $baseDir src test_files hdl test07ram.coe ] } \
+        ] [get_ips imemory]
 }
 
 if { ![load_ip ram]} {
