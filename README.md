@@ -1,4 +1,4 @@
-<center>
+<div align="center">
 
 # risc-v
 
@@ -9,4 +9,4 @@
 Developed as part of the summer 2022 **Prozessorbau** course at **Uni Augsburg**
 
 </small>
-</center>
+</div align="center">
