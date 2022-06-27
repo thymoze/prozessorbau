@@ -25,7 +25,8 @@ entity Decode is
 
         InterlockO : out std_logic;
         Imm : out std_logic_vector (31 downto 0);
-        SelSrc2 : out std_logic
+        SelSrc2 : out std_logic;
+        Set7Seg : out std_logic
     );
 end Decode;
 
@@ -52,6 +53,7 @@ begin
         MemAccess <= '0';
         MemWrEn <= '0';
         InterlockO <= '0';
+        Set7Seg <= '0';
 
         case opcode is
             when opcode_OP =>
@@ -118,6 +120,12 @@ begin
                 DestWrEn <= '0';
                 DestRegNo <= "00000";
                 SelSrc2 <= '0';
+
+            when opcode_SYSTEM =>
+                -- csrw instruction: write to seven_seg display
+                if funct3 = "001" and DestRegNo = "00000" and Imm = x"00000788" then
+                    Set7Seg <= '1';
+                end if;
 
             when others => null;
         end case;

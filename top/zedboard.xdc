@@ -1,6 +1,7 @@
 # ----------------------------------------------------------------------------
 #     _____
-#    / #   /____   \____
+#    /     \
+#   /____   \____
 #  / \===\   \==/
 # /___\===\___\/  AVNET Design Resource Center
 #      \======/         www.em.avnet.com/drc
@@ -78,56 +79,57 @@
 # ----------------------------------------------------------------------------
 # Clock Source - Bank 13
 # ----------------------------------------------------------------------------
-set_property PACKAGE_PIN Y9 [get_ports {GCLK}];
+set_property PACKAGE_PIN Y9 [get_ports {GCLK}];  # "GCLK"
 
 # ----------------------------------------------------------------------------
 # JA Pmod - Bank 13
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN Y11  [get_ports {JA1}];  # "JA1"
-#set_property PACKAGE_PIN AA8  [get_ports {JA10}];  # "JA10"
-#set_property PACKAGE_PIN AA11 [get_ports {JA2}];  # "JA2"
-#set_property PACKAGE_PIN Y10  [get_ports {JA3}];  # "JA3"
-#set_property PACKAGE_PIN AA9  [get_ports {JA4}];  # "JA4"
-#set_property PACKAGE_PIN AB11 [get_ports {JA7}];  # "JA7"
-#set_property PACKAGE_PIN AB10 [get_ports {JA8}];  # "JA8"
-#set_property PACKAGE_PIN AB9  [get_ports {JA9}];  # "JA9"
+set_property PACKAGE_PIN Y11  [get_ports {JA1 JA[0]}];  # "JA1"
+set_property PACKAGE_PIN AA11 [get_ports {JA2 JA[1]}];  # "JA2"
+set_property PACKAGE_PIN Y10  [get_ports {JA3 JA[2]}];  # "JA3"
+set_property PACKAGE_PIN AA9  [get_ports {JA4 JA[3]}];  # "JA4"
+#set_property PACKAGE_PIN AB11 [get_ports {JA7 JA[4]}];  # "JA7"
+#set_property PACKAGE_PIN AB10 [get_ports {JA8 JA[5]}];  # "JA8"
+#set_property PACKAGE_PIN AB9  [get_ports {JA9 JA[6]}];  # "JA9"
+#set_property PACKAGE_PIN AA8  [get_ports {JA10 JA[7]}]; # "JA10"
 
 
 # ----------------------------------------------------------------------------
 # JB Pmod - Bank 13
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN W12 [get_ports {JB1}];  # "JB1"
-#set_property PACKAGE_PIN W11 [get_ports {JB2}];  # "JB2"
-#set_property PACKAGE_PIN V10 [get_ports {JB3}];  # "JB3"
-#set_property PACKAGE_PIN W8 [get_ports {JB4}];  # "JB4"
-#set_property PACKAGE_PIN V12 [get_ports {JB7}];  # "JB7"
-#set_property PACKAGE_PIN W10 [get_ports {JB8}];  # "JB8"
-#set_property PACKAGE_PIN V9 [get_ports {JB9}];  # "JB9"
-#set_property PACKAGE_PIN V8 [get_ports {JB10}];  # "JB10"
+set_property PACKAGE_PIN W12 [get_ports {JB1 JB[0]}];   # "JB1"
+set_property PACKAGE_PIN W11 [get_ports {JB2 JB[1]}];   # "JB2"
+set_property PACKAGE_PIN V10 [get_ports {JB3 JB[2]}];   # "JB3"
+set_property PACKAGE_PIN W8 [get_ports  {JB4 JB[3]}];   # "JB4"
+#set_property PACKAGE_PIN V12 [get_ports {JB7 JB[4]}];   # "JB7"
+#set_property PACKAGE_PIN W10 [get_ports {JB8 JB[5]}];   # "JB8"
+#set_property PACKAGE_PIN V9 [get_ports  {JB9 JB[6]}];   # "JB9"
+#set_property PACKAGE_PIN V8 [get_ports  {JB10 JB[7]}];  # "JB10"
 
 # ----------------------------------------------------------------------------
 # JC Pmod - Bank 13
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN AB6 [get_ports {JC1_N}];  # "JC1_N"
-#set_property PACKAGE_PIN AB7 [get_ports {JC1_P}];  # "JC1_P"
-#set_property PACKAGE_PIN AA4 [get_ports {JC2_N}];  # "JC2_N"
-#set_property PACKAGE_PIN Y4  [get_ports {JC2_P}];  # "JC2_P"
-#set_property PACKAGE_PIN T6  [get_ports {JC3_N}];  # "JC3_N"
-#set_property PACKAGE_PIN R6  [get_ports {JC3_P}];  # "JC3_P"
-#set_property PACKAGE_PIN U4  [get_ports {JC4_N}];  # "JC4_N"
-#set_property PACKAGE_PIN T4  [get_ports {JC4_P}];  # "JC4_P"
+set_property PACKAGE_PIN AB7 [get_ports {JC1_P JC[0]}];   # "JC1_P"
+set_property PACKAGE_PIN AB6 [get_ports {JC1_N JC[1]}];   # "JC1_N"
+set_property PACKAGE_PIN Y4  [get_ports {JC2_P JC[2]}];   # "JC2_P"
+set_property PACKAGE_PIN AA4 [get_ports {JC2_N JC[3]}];   # "JC2_N"
+#set_property PACKAGE_PIN R6  [get_ports {JC3_P JC[4]}];  # "JC3_P"
+#set_property PACKAGE_PIN T6  [get_ports {JC3_N JC[5]}];  # "JC3_N"
+#set_property PACKAGE_PIN T4  [get_ports {JC4_P JC[6]}];  # "JC4_P"
+#set_property PACKAGE_PIN U4  [get_ports {JC4_N JC[7]}];  # "JC4_N"
+
 
 # ----------------------------------------------------------------------------
 # JD Pmod - Bank 13
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN W7 [get_ports {JD1_N}];  # "JD1_N"
-#set_property PACKAGE_PIN V7 [get_ports {JD1_P}];  # "JD1_P"
-#set_property PACKAGE_PIN V4 [get_ports {JD2_N}];  # "JD2_N"
-#set_property PACKAGE_PIN V5 [get_ports {JD2_P}];  # "JD2_P"
-#set_property PACKAGE_PIN W5 [get_ports {JD3_N}];  # "JD3_N"
-#set_property PACKAGE_PIN W6 [get_ports {JD3_P}];  # "JD3_P"
-#set_property PACKAGE_PIN U5 [get_ports {JD4_N}];  # "JD4_N"
-#set_property PACKAGE_PIN U6 [get_ports {JD4_P}];  # "JD4_P"
+set_property PACKAGE_PIN V7 [get_ports {JD1_P JD[0]}];  # "JD1_P"
+set_property PACKAGE_PIN W7 [get_ports {JD1_N JD[1]}];  # "JD1_N"
+set_property PACKAGE_PIN V5 [get_ports {JD2_P JD[2]}];  # "JD2_P"
+set_property PACKAGE_PIN V4 [get_ports {JD2_N JD[3]}];  # "JD2_N"
+#set_property PACKAGE_PIN W6 [get_ports {JD3_P JD[4]}];  # "JD3_P"
+#set_property PACKAGE_PIN W5 [get_ports {JD3_N JD[5]}];  # "JD3_N"
+#set_property PACKAGE_PIN U6 [get_ports {JD4_P JD[6]}];  # "JD4_P"
+#set_property PACKAGE_PIN U5 [get_ports {JD4_N JD[7]}];  # "JD4_N"
 
 # ----------------------------------------------------------------------------
 # OLED Display - Bank 13
@@ -142,43 +144,43 @@ set_property PACKAGE_PIN Y9 [get_ports {GCLK}];
 # ----------------------------------------------------------------------------
 # HDMI Output - Bank 33
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN W18  [get_ports {HD_CLK}];  # "HD-CLK"
-#set_property PACKAGE_PIN Y13  [get_ports {HD_D0}];  # "HD-D0"
-#set_property PACKAGE_PIN AA13 [get_ports {HD_D1}];  # "HD-D1"
-#set_property PACKAGE_PIN W13  [get_ports {HD_D10}];  # "HD-D10"
-#set_property PACKAGE_PIN W15  [get_ports {HD_D11}];  # "HD-D11"
-#set_property PACKAGE_PIN V15  [get_ports {HD_D12}];  # "HD-D12"
-#set_property PACKAGE_PIN U17  [get_ports {HD_D13}];  # "HD-D13"
-#set_property PACKAGE_PIN V14  [get_ports {HD_D14}];  # "HD-D14"
-#set_property PACKAGE_PIN V13  [get_ports {HS_D15}];  # "HD-D15"
-#set_property PACKAGE_PIN AA14 [get_ports {HD_D2}];  # "HD-D2"
-#set_property PACKAGE_PIN Y14  [get_ports {HD_D3}];  # "HD-D3"
-#set_property PACKAGE_PIN AB15 [get_ports {HD_D4}];  # "HD-D4"
-#set_property PACKAGE_PIN AB16 [get_ports {HD_D5}];  # "HD-D5"
-#set_property PACKAGE_PIN AA16 [get_ports {HD_D6}];  # "HD-D6"
-#set_property PACKAGE_PIN AB17 [get_ports {HD_D7}];  # "HD-D7"
-#set_property PACKAGE_PIN AA17 [get_ports {HD_D8}];  # "HD-D8"
-#set_property PACKAGE_PIN Y15  [get_ports {HD_D9}];  # "HD-D9"
-#set_property PACKAGE_PIN U16  [get_ports {HD_DE}];  # "HD-DE"
-#set_property PACKAGE_PIN V17  [get_ports {HD_HSYNC}];  # "HD-HSYNC"
-#set_property PACKAGE_PIN W16  [get_ports {HD_INT}];  # "HD-INT"
-#set_property PACKAGE_PIN AA18 [get_ports {HD_SCL}];  # "HD-SCL"
-#set_property PACKAGE_PIN Y16  [get_ports {HD_SDA}];  # "HD-SDA"
-#set_property PACKAGE_PIN U15  [get_ports {HD_SPDIF}];  # "HD-SPDIF"
-#set_property PACKAGE_PIN Y18  [get_ports {HD_SPDIFO}];  # "HD-SPDIFO"
-#set_property PACKAGE_PIN W17  [get_ports {HD_VSYNC}];  # "HD-VSYNC"
+#set_property PACKAGE_PIN W18  [get_ports {HD_CLK}];   # "HD-CLK"
+#set_property PACKAGE_PIN Y13  [get_ports {HD_D0}];    # "HD-D0"
+#set_property PACKAGE_PIN AA13 [get_ports {HD_D1}];    # "HD-D1"
+#set_property PACKAGE_PIN W13  [get_ports {HD_D10}];   # "HD-D10"
+#set_property PACKAGE_PIN W15  [get_ports {HD_D11}];   # "HD-D11"
+#set_property PACKAGE_PIN V15  [get_ports {HD_D12}];   # "HD-D12"
+#set_property PACKAGE_PIN U17  [get_ports {HD_D13}];   # "HD-D13"
+#set_property PACKAGE_PIN V14  [get_ports {HD_D14}];   # "HD-D14"
+#set_property PACKAGE_PIN V13  [get_ports {HS_D15}];   # "HD-D15"
+#set_property PACKAGE_PIN AA14 [get_ports {HD_D2}];    # "HD-D2"
+#set_property PACKAGE_PIN Y14  [get_ports {HD_D3}];    # "HD-D3"
+#set_property PACKAGE_PIN AB15 [get_ports {HD_D4}];    # "HD-D4"
+#set_property PACKAGE_PIN AB16 [get_ports {HD_D5}];    # "HD-D5"
+#set_property PACKAGE_PIN AA16 [get_ports {HD_D6}];    # "HD-D6"
+#set_property PACKAGE_PIN AB17 [get_ports {HD_D7}];    # "HD-D7"
+#set_property PACKAGE_PIN AA17 [get_ports {HD_D8}];    # "HD-D8"
+#set_property PACKAGE_PIN Y15  [get_ports {HD_D9}];    # "HD-D9"
+#set_property PACKAGE_PIN U16  [get_ports {HD_DE}];    # "HD-DE"
+#set_property PACKAGE_PIN V17  [get_ports {HD_HSYNC}]; # "HD-HSYNC"
+#set_property PACKAGE_PIN W16  [get_ports {HD_INT}];   # "HD-INT"
+#set_property PACKAGE_PIN AA18 [get_ports {HD_SCL}];   # "HD-SCL"
+#set_property PACKAGE_PIN Y16  [get_ports {HD_SDA}];   # "HD-SDA"
+#set_property PACKAGE_PIN U15  [get_ports {HD_SPDIF}]; # "HD-SPDIF"
+#set_property PACKAGE_PIN Y18  [get_ports {HD_SPDIFO}];# "HD-SPDIFO"
+#set_property PACKAGE_PIN W17  [get_ports {HD_VSYNC}]; # "HD-VSYNC"
 
 # ----------------------------------------------------------------------------
 # User LEDs - Bank 33
 # ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN T22 [get_ports {LD0}];  # "LD0"
-#set_property PACKAGE_PIN T21 [get_ports {LD1}];  # "LD1"
-#set_property PACKAGE_PIN U22 [get_ports {LD2}];  # "LD2"
-#set_property PACKAGE_PIN U21 [get_ports {LD3}];  # "LD3"
-#set_property PACKAGE_PIN V22 [get_ports {LD4}];  # "LD4"
-#set_property PACKAGE_PIN W22 [get_ports {LD5}];  # "LD5"
-#set_property PACKAGE_PIN U19 [get_ports {LD6}];  # "LD6"
-#set_property PACKAGE_PIN U14 [get_ports {LD7}];  # "LD7"
+#set_property PACKAGE_PIN T22 [get_ports {LD0 LED[0]}];  # "LD0"
+#set_property PACKAGE_PIN T21 [get_ports {LD1 LED[1]}];  # "LD1"
+#set_property PACKAGE_PIN U22 [get_ports {LD2 LED[2]}];  # "LD2"
+#set_property PACKAGE_PIN U21 [get_ports {LD3 LED[3]}];  # "LD3"
+#set_property PACKAGE_PIN V22 [get_ports {LD4 LED[4]}];  # "LD4"
+#set_property PACKAGE_PIN W22 [get_ports {LD5 LED[5]}];  # "LD5"
+#set_property PACKAGE_PIN U19 [get_ports {LD6 LED[6]}];  # "LD6"
+#set_property PACKAGE_PIN U14 [get_ports {LD7 LED[7]}];  # "LD7"
 
 # ----------------------------------------------------------------------------
 # VGA Output - Bank 33
@@ -233,14 +235,14 @@ set_property PACKAGE_PIN R18 [get_ports {BTNR}];  # "BTNR"
 ## ----------------------------------------------------------------------------
 ## User DIP Switches - Bank 35
 ## ----------------------------------------------------------------------------
-#set_property PACKAGE_PIN F22 [get_ports {SW0}];  # "SW0"
-#set_property PACKAGE_PIN G22 [get_ports {SW1}];  # "SW1"
-#set_property PACKAGE_PIN H22 [get_ports {SW2}];  # "SW2"
-#set_property PACKAGE_PIN F21 [get_ports {SW3}];  # "SW3"
-#set_property PACKAGE_PIN H19 [get_ports {SW4}];  # "SW4"
-#set_property PACKAGE_PIN H18 [get_ports {SW5}];  # "SW5"
-#set_property PACKAGE_PIN H17 [get_ports {SW6}];  # "SW6"
-#set_property PACKAGE_PIN M15 [get_ports {SW7}];  # "SW7"
+#set_property PACKAGE_PIN F22 [get_ports {SW0 SW[0]}];  # "SW0"
+#set_property PACKAGE_PIN G22 [get_ports {SW1 SW[1]}];  # "SW1"
+#set_property PACKAGE_PIN H22 [get_ports {SW2 SW[2]}];  # "SW2"
+#set_property PACKAGE_PIN F21 [get_ports {SW3 SW[3]}];  # "SW3"
+#set_property PACKAGE_PIN H19 [get_ports {SW4 SW[4]}];  # "SW4"
+#set_property PACKAGE_PIN H18 [get_ports {SW5 SW[5]}];  # "SW5"
+#set_property PACKAGE_PIN H17 [get_ports {SW6 SW[6]}];  # "SW6"
+#set_property PACKAGE_PIN M15 [get_ports {SW7 SW[7]}];  # "SW7"
 
 ## ----------------------------------------------------------------------------
 ## XADC AD Channels - Bank 35
@@ -363,7 +365,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 33]];
 # Set the bank voltage for IO Bank 34 to 1.8V by default.
 # set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 34]];
 # set_property IOSTANDARD LVCMOS25 [get_ports -of_objects [get_iobanks 34]];
-set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 34]]
+set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 34]];
 
 # Set the bank voltage for IO Bank 35 to 1.8V by default.
 # set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 35]];
@@ -371,7 +373,4 @@ set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 34]]
 set_property IOSTANDARD LVCMOS18 [get_ports -of_objects [get_iobanks 35]];
 
 # Note that the bank voltage for IO Bank 13 is fixed to 3.3V on ZedBoard.
-set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 13]]
-
-
-
+set_property IOSTANDARD LVCMOS33 [get_ports -of_objects [get_iobanks 13]];

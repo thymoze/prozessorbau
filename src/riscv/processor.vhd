@@ -2,10 +2,14 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+use work.seven_seg.all;
+
 entity processor is
     port (
         CLK : in std_logic;
-        RST : in std_logic
+        RST : in std_logic;
+
+        SevenSeg : out SevenSegData
     );
 end processor;
 
@@ -43,6 +47,7 @@ architecture Behavioral of processor is
     signal ID_EX_JumpTarget : std_logic_vector (31 downto 0);
     signal ID_EX_MemAccess : std_logic;
     signal ID_EX_MemWrEn : std_logic;
+    signal ID_EX_Set7Seg : std_logic;
 
     -- execute
     signal EX_SrcData1, EX_SrcData2, EX_Data2 : std_logic_vector(31 downto 0);
@@ -61,6 +66,7 @@ architecture Behavioral of processor is
     signal EX_Clear : std_logic;
     signal EX_MemAccess : std_logic;
     signal EX_MemWrEn : std_logic;
+    signal EX_Set7Seg : std_logic;
 
     signal EX_IF_Jump : std_logic;
     signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
@@ -193,7 +199,8 @@ begin
             PCNext => ID_EX_PCNext,
             Jump => ID_EX_Jump, JumpRel => ID_EX_JumpRel, JumpTarget => ID_EX_JumpTarget,
             MemAccess => ID_EX_MemAccess, MemWrEn => ID_EX_MemWrEn,
-            InterlockO => ID_IF_Interlock
+            InterlockO => ID_IF_Interlock,
+            Set7Seg => ID_EX_Set7Seg
         );
 
     regset : entity work.RegisterSet
@@ -234,6 +241,7 @@ begin
             PCNextI => ID_EX_PCNext,
             JumpI => ID_EX_Jump, JumpRelI => ID_EX_JumpRel, JumpTargetI => ID_EX_JumpTarget,
             ClearI => EX_JumpO,
+            Set7SegI => ID_EX_Set7Seg,
 
             FunctO => EX_Funct,
             AuxO => EX_Aux,
@@ -244,7 +252,8 @@ begin
             MemAccessO => EX_MemAccess, MemWrEnO => EX_MemWrEn,
             PCNextO => EX_PCNext,
             JumpO => EX_Jump, JumpRelO => EX_JumpRel, JumpTargetO => EX_JumpTarget,
-            ClearO => EX_Clear
+            ClearO => EX_Clear,
+            Set7SegO => EX_Set7Seg
         );
 
     immOrReg : entity work.MUX
@@ -277,6 +286,16 @@ begin
     EX_IF_MemAccess <= EX_MEM_MemAccess;
 
     EX_ID_Jump <= EX_JumpO;
+
+    seven_seg : entity work.SevenSeg
+        port map(
+            CLK => CLK, RST => RST,
+
+            Set => EX_Set7Seg,
+            V => EX_SrcData1,
+
+            Pmod => SevenSeg
+        );
 
     --
     -- MEM
