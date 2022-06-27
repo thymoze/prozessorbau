@@ -1,6 +1,8 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 
+use work.constants.all;
+
 entity MemStage is
     port (
         CLK, RST : in std_logic;
@@ -46,6 +48,7 @@ begin
 
             RamReadEn <= '0';
             RamWriteEn <= '0';
+            RamAddress <= (others => '0');
 
             FunctO <= "000";
             StallO <= '0';
@@ -64,9 +67,9 @@ begin
 
             case current_state is
                 when Idle =>
-                    MemRdData <= (others => '0');
-                    -- addresses < x1000 go to the rom, not the ram, and complete in 1 cycle
-                    if MemAccessI = '1' and DestDataI >= x"1000" then
+                    MemRdData <= (others => '0'); -- TODO: For some reason this gets written to the register
+                    -- addresses < ROM_SIZE go to the rom, not the ram, and complete in 1 cycle
+                    if MemAccessI = '1' and DestDataI >= ROM_SIZE then
                         RamAddress <= DestDataI(31 downto 2) & b"00"; -- set lowest two bits to 0 to ensure alignment
                         StallO <= '1';
 

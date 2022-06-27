@@ -1,4 +1,4 @@
-variable baseDir [file join [file dirname [file normalize [info script]]] ../]
+variable baseDir [file normalize [file join [file dirname [file normalize [info script]]] ..]]
 variable ipDir [file join $baseDir scripts ip]
 file mkdir $ipDir
 
@@ -47,7 +47,7 @@ if { ![load_ip imemory] } {
         CONFIG.Port_B_Clock {100} \
         CONFIG.Port_B_Enable_Rate {100} \
         CONFIG.Load_Init_File {true} \
-        CONFIG.Coe_File { [ file join $baseDir src test_files hdl test07ram.coe ] } \
+        CONFIG.Coe_File [ file join $baseDir src test_files hdl test07ram.coe ] \
         ] [get_ips imemory]
 }
 

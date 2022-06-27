@@ -18,13 +18,13 @@ end MemMux;
 
 architecture Behavioral of MemMux is
 begin
-    process (Sel, ALUDataIn, MemDataIn, FunctI)
+    process (Sel, ALUDataIn, MemDataIn, ROMDataIn, FunctI)
         variable dataIn : std_logic_vector(31 downto 0);
     begin
         if Sel = '0' then
             WrData <= ALUDataIn;
         else
-            if ALUDataIn < x"1000" then
+            if ALUDataIn < ROM_SIZE then
                 dataIn := ROMDataIn;
             else
                 dataIn := MemDataIn;
