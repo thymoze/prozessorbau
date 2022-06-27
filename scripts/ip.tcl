@@ -47,7 +47,7 @@ if { ![load_ip imemory] } {
         CONFIG.Port_B_Clock {100} \
         CONFIG.Port_B_Enable_Rate {100} \
         CONFIG.Load_Init_File {true} \
-        CONFIG.Coe_File [ file join $baseDir src test_files hdl test07ram.coe ] \
+        CONFIG.Coe_File [ file join $baseDir src test_files hdl test10esel.coe ] \
         ] [get_ips imemory]
 }
 

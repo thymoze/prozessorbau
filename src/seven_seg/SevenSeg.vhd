@@ -24,13 +24,14 @@ begin
 
     process (CLK, RST)
     begin
-        if RST = '1' then
+        if RST = '0' then
             state <= (others => '0');
             seg1 <= (others => '0');
             seg2 <= (others => '0');
             currentDigit <= '0';
 
             counter <= 0;
+            Pmod <= (others => "0000");
         elsif rising_edge(CLK) then
             if Set = '1' then
                 state <= V;

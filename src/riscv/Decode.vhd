@@ -123,7 +123,7 @@ begin
 
             when opcode_SYSTEM =>
                 -- csrw instruction: write to seven_seg display
-                if funct3 = "001" and DestRegNo = "00000" and Imm = x"00000788" then
+                if funct3 = "001" and Inst(11 downto 7) = "00000" and std_logic_vector(resize(signed(Inst(31 downto 20)), 32)) = x"00000788" then
                     Set7Seg <= '1';
                 end if;
 
