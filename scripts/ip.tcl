@@ -30,7 +30,7 @@ if { ![load_ip memory] } {
 }
 
 if { ![load_ip imemory] } {
-    create_ip -name blk_mem_gen -vendor xilinx.com -library ip -version 8.4 -module_name imemory
+    create_ip -name blk_mem_gen -vendor xilinx.com -library ip -version 8.4 -module_name imemory -dir $ipDir
     set_property -dict [list \
         CONFIG.Component_Name {imemory} \
         CONFIG.Memory_Type {Dual_Port_ROM} \
