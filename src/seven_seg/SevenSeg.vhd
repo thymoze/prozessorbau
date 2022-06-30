@@ -1,7 +1,20 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
+
+package seven_seg is
+    type SevenSegData is record
+        A : std_logic_vector (3 downto 0);
+        B : std_logic_vector (3 downto 0);
+        C : std_logic_vector (3 downto 0);
+        D : std_logic_vector (3 downto 0);
+    end record;
+end seven_seg;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-use work.seven_seg.all;
+use work.seven_seg.SevenSegData;
+use work.util.to_integer;
 
 entity SevenSeg is
     port (
@@ -37,16 +50,8 @@ begin
                 state <= V;
             end if;
 
-            seg1(7) <= currentDigit;
-            seg2(7) <= currentDigit;
-
-            if currentDigit = '0' then
-                seg1(6 downto 0) <= state(6 downto 0);
-                seg2(6 downto 0) <= state(22 downto 16);
-            else
-                seg1(6 downto 0) <= state(14 downto 8);
-                seg2(6 downto 0) <= state(30 downto 24);
-            end if;
+            seg1 <= currentDigit & state((to_integer(currentDigit) * 8) + 6 downto to_integer(currentDigit) * 8);
+            seg2 <= currentDigit & state((to_integer(currentDigit) * 8) + 22 downto (to_integer(currentDigit) * 8) + 16);
 
             counter <= counter + 1;
 
