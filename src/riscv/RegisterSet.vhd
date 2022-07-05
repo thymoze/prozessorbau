@@ -20,10 +20,16 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
+use work.types.thread_tag_t;
 
 entity RegisterSet is
+    generic (
+        ThreadCount : integer
+    );
     port (
         CLK, RST : in std_logic;
+
+        ThreadTag : in thread_tag_t;
 
         RdRegNo1, RdRegNo2 : in std_logic_vector (4 downto 0);
 
@@ -36,24 +42,25 @@ entity RegisterSet is
 end RegisterSet;
 
 architecture Behavioral of RegisterSet is
-    type TRegisters is array (0 to 31) of std_logic_vector(31 downto 0);
-    signal Registers : TRegisters;
+    type registers_t is array (0 to 31) of std_logic_vector(31 downto 0);
+    type thread_registers_t is array (0 to ThreadCount - 1) of registers_t;
+
+    signal RegisterSets : thread_registers_t;
 begin
-    process (CLK, RST, WrEn, WrRegNo, WrData)
-        variable curr : std_logic_vector (2 downto 0);
+    process (CLK, RST)
     begin
         if (RST = '0') then
-            Registers <= (1 => x"00000001", others => x"00000000");
+            RegisterSets <= (others => (1 => x"00000001", others => x"00000000"));
         elsif rising_edge(CLK) then
             if WrEn = '1' and unsigned(WrRegNo) /= 0 then
-                Registers(to_integer(unsigned(WrRegNo))) <= WrData;
+                RegisterSets(ThreadTag)(to_integer(unsigned(WrRegNo))) <= WrData;
             end if;
         end if;
     end process;
 
-    process (Registers, RdRegNo1, RdRegNo2)
+    process (RegisterSets, RdRegNo1, RdRegNo2)
     begin
-        RdData1 <= Registers(to_integer(unsigned(RdRegNo1)));
-        RdData2 <= Registers(to_integer(unsigned(RdRegNo2)));
+        RdData1 <= RegisterSets(ThreadTag)(to_integer(unsigned(RdRegNo1)));
+        RdData2 <= RegisterSets(ThreadTag)(to_integer(unsigned(RdRegNo2)));
     end process;
 end Behavioral;

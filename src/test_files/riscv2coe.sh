@@ -18,11 +18,13 @@ output="${2:-${dirname}/${filename}}"
 output="${output%.*}"
 output_basename=$(basename "$output")
 
-riscv64-unknown-elf-as "$input" -o "${output}.o"
-readarray -t instructions < <(riscv64-unknown-elf-objdump -d "${output}.o" | awk '/^....:/{print $2}')
-rm "${output}.o"
+tempDir=$(mktemp -d)
+tempOutput="${tempDir}/${output_basename}.o"
 
-name="imem_${output_basename// /_}"
+riscv64-unknown-elf-as "$input" -o "${tempOutput}"
+readarray -t instructions < <(riscv64-unknown-elf-objdump -d "${tempOutput}" | tee /dev/tty | awk '/^....:/{print $2}')
+rm "${tempOutput}"
+
 total=1023
 remainder=$((total - ${#instructions[@]}))
 
@@ -30,8 +32,7 @@ cat > "${output}.coe" << EOF
 ;Initialization file for ${output_basename}
 memory_initialization_radix = 16;
 memory_initialization_vector =
-
-
+$(printf "%s %s %s %s %s %s %s %s\n" ${instructions[@]} $(for i in $(eval echo "{0..${remainder}}"); do echo "00000000"; done))
 EOF
 
 #riscv64-unknown-elf-as $1 -o $FILENAME.o

@@ -1,10 +1,11 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-
+use work.constants.all;
+use work.types.all;
 use work.seven_seg.all;
 
-entity processor is
+entity Processor is
     port (
         CLK : in std_logic;
         RST : in std_logic;
@@ -13,14 +14,17 @@ entity processor is
     );
 end processor;
 
-architecture Behavioral of processor is
+architecture Behavioral of Processor is
     -- instruction fetch
     signal IF_PC : std_logic_vector (31 downto 0);
     signal IF_PCNext : std_logic_vector (31 downto 0);
     signal IF_ImemAddr : std_logic_vector(9 downto 0);
+    signal IF_ThreadTag : thread_tag_t := 0;
+    signal IF_ThreadTagNext : thread_tag_t := 0;
 
     signal IF_ID_Inst : std_logic_vector (31 downto 0);
     signal IF_ID_PC : std_logic_vector (31 downto 0);
+    signal IF_ID_ThreadTag : thread_tag_t := 0;
 
     signal IF_MEM_ROMDataIn : std_logic_vector (31 downto 0);
 
@@ -37,6 +41,7 @@ architecture Behavioral of processor is
     signal ID_DestRegNo : std_logic_vector(4 downto 0);
     signal ID_Clear : std_logic;
     signal ID_Interlock : std_logic;
+    signal ID_ThreadTag : thread_tag_t := 0;
 
     signal ID_IF_Interlock : std_logic;
 
@@ -99,48 +104,27 @@ architecture Behavioral of processor is
 
     signal MEM_ID_WrData : std_logic_vector (31 downto 0);
 
-    signal AXI_awaddr : std_logic_vector (31 downto 0);
-    signal AXI_awprot : std_logic_vector (2 downto 0);
-    signal AXI_awvalid : std_logic;
-    signal AXI_wdata : std_logic_vector (31 downto 0);
-    signal AXI_wstrb : std_logic_vector (3 downto 0);
-    signal AXI_wvalid : std_logic;
-    signal AXI_bready : std_logic;
-    signal AXI_araddr : std_logic_vector (31 downto 0);
-    signal AXI_arprot : std_logic_vector (2 downto 0);
-    signal AXI_arvalid : std_logic;
-    signal AXI_rready : std_logic;
-    signal AXI_awready : std_logic;
-    signal AXI_wready : std_logic;
-    signal AXI_bresp : std_logic_vector (1 downto 0);
-    signal AXI_bvalid : std_logic;
-    signal AXI_arready : std_logic;
-    signal AXI_rdata : std_logic_vector (31 downto 0);
-    signal AXI_rresp : std_logic_vector (1 downto 0);
-    signal AXI_rvalid : std_logic;
-    signal BRAM_PortA_Addr : std_logic_vector (14 downto 0);
-    signal BRAM_PortA_CLK : std_logic;
-    signal BRAM_PortA_En : std_logic;
-    signal BRAM_PortA_DOut : std_logic_vector (31 downto 0);
-    signal BRAM_PortA_RST : std_logic;
-    signal BRAM_PortA_We : std_logic_vector (3 downto 0);
-    signal BRAM_PortA_DIn : std_logic_vector (31 downto 0);
-
 begin
     -----------------------
     -- INSTRUCTION FETCH --
     -----------------------
-    fetch : entity work.FetchStage
+    fetchStage : entity work.FetchStage
         port map(
             CLK => CLK, RST => RST,
 
             PCI => IF_PCNext,
+            ThreadTagI => IF_ThreadTagNext,
 
-            PCO => IF_PC
+            PCO => IF_PC,
+            ThreadTagO => IF_ThreadTag
         );
 
-    fetcher : entity work.Fetch
+    fetch : entity work.Fetch
+        generic map(
+            ThreadCount => THREAD_COUNT
+        )
         port map(
+            ThreadTagI => IF_ThreadTag,
             PCI => IF_PC,
             Jump => EX_IF_Jump,
             JumpTarget => EX_IF_JumpTarget,
@@ -148,7 +132,9 @@ begin
             Stall => MEM_Stall,
 
             PCNext => IF_PCNext,
+            ThreadTagNext => IF_ThreadTagNext,
             PC => IF_ID_PC,
+            ThreadTagO => IF_ID_ThreadTag,
             ImemAddr => IF_ImemAddr
         );
 
@@ -167,7 +153,7 @@ begin
     ------------------------
     -- INSTRUCTION DECODE --
     ------------------------
-    decode : entity work.DecodeStage
+    decodeStage : entity work.DecodeStage
         port map(
             CLK => CLK, RST => RST,
 
@@ -176,14 +162,16 @@ begin
             ClearI => EX_ID_Jump,
             InterlockI => ID_IF_Interlock,
             Stall => MEM_Stall,
+            ThreadTagI => IF_ID_ThreadTag,
 
             InstO => ID_Inst,
             PCO => ID_PC,
             ClearO => ID_Clear,
-            InterlockO => ID_Interlock
+            InterlockO => ID_Interlock,
+            ThreadTagO => ID_ThreadTag
         );
 
-    decoder : entity work.Decode
+    decode : entity work.Decode
         port map(
             Inst => ID_Inst,
             PC => ID_PC,
@@ -204,11 +192,15 @@ begin
         );
 
     regset : entity work.RegisterSet
+        generic map(
+            ThreadCount => THREAD_COUNT
+        )
         port map(
             CLK => CLK, RST => RST,
 
             RdRegNo1 => ID_SrcReg1, RdRegNo2 => ID_SrcReg2,
             WrEn => MEM_DestWrEn, WrRegNo => MEM_DestRegNo, WrData => MEM_ID_WrData,
+            ThreadTag => ID_ThreadTag,
 
             RdData1 => ID_RegData1, RdData2 => ID_RegData2
         );
@@ -226,7 +218,7 @@ begin
     -------------
     -- EXECUTE --
     -------------
-    ex : entity work.ExecuteStage
+    exStage : entity work.ExecuteStage
         port map(
             CLK => CLK, RST => RST,
 
@@ -300,7 +292,7 @@ begin
     --
     -- MEM
     --
-    mem : entity work.MemStage
+    memStage : entity work.MemStage
         port map(
             CLK => CLK, RST => RST,
 
@@ -319,84 +311,18 @@ begin
             StallO => MEM_Stall
         );
 
-    axi : entity work.AXI_Mem_Interface
+    mem : entity work.Mem
         port map(
-            M_AXI_aclk => CLK, M_AXI_aresetn => RST,
+            CLK => CLK, RST => RST,
 
-            ReadEn => MEM_RamReadEn,
-            WriteEn => MEM_RamWriteEn,
-            WrByteEna => MEM_RamByteEna,
-            Address => MEM_RamAddress,
-            DataIn => MEM_RamWrData,
+            RamReadEn => MEM_RamReadEn,
+            RamWriteEn => MEM_RamWriteEn,
+            RamByteEna => MEM_RamByteEna,
+            RamAddress => MEM_RamAddress,
+            RamWrData => MEM_RamWrData,
 
-            DataOut => MEM_RamRdData,
-            busy => MEM_RamBusy,
-
-            M_AXI_awready => AXI_awready,
-            M_AXI_wready => AXI_wready,
-            M_AXI_bresp => AXI_bresp,
-            M_AXI_bvalid => AXI_bvalid,
-            M_AXI_arready => AXI_arready,
-            M_AXI_rdata => AXI_rdata,
-            M_AXI_rresp => AXI_rresp,
-            M_AXI_rvalid => AXI_rvalid,
-
-            M_AXI_awaddr => AXI_awaddr,
-            M_AXI_awprot => AXI_awprot,
-            M_AXI_awvalid => AXI_awvalid,
-            M_AXI_wdata => AXI_wdata,
-            M_AXI_wstrb => AXI_wstrb,
-            M_AXI_wvalid => AXI_wvalid,
-            M_AXI_bready => AXI_bready,
-            M_AXI_araddr => AXI_araddr,
-            M_AXI_arprot => AXI_arprot,
-            M_AXI_arvalid => AXI_arvalid,
-            M_AXI_rready => AXI_rready
-        );
-
-    ram : entity work.ram
-        port map(
-            s_axi_aclk => CLK, s_axi_aresetn => RST,
-
-            s_axi_awaddr => AXI_awaddr(14 downto 0),
-            s_axi_awprot => AXI_awprot,
-            s_axi_awvalid => AXI_awvalid,
-            s_axi_wdata => AXI_wdata,
-            s_axi_wstrb => AXI_wstrb,
-            s_axi_wvalid => AXI_wvalid,
-            s_axi_bready => AXI_bready,
-            s_axi_araddr => AXI_araddr(14 downto 0),
-            s_axi_arprot => AXI_arprot,
-            s_axi_arvalid => AXI_arvalid,
-            s_axi_rready => AXI_rready,
-
-            s_axi_awready => AXI_awready,
-            s_axi_wready => AXI_wready,
-            s_axi_bresp => AXI_bresp,
-            s_axi_bvalid => AXI_bvalid,
-            s_axi_arready => AXI_arready,
-            s_axi_rdata => AXI_rdata,
-            s_axi_rresp => AXI_rresp,
-            s_axi_rvalid => AXI_rvalid,
-
-            bram_addr_a => BRAM_PortA_Addr,
-            bram_clk_a => BRAM_PortA_CLK,
-            bram_en_a => BRAM_PortA_En,
-            bram_rddata_a => BRAM_PortA_DOut,
-            bram_rst_a => BRAM_PortA_RST,
-            bram_we_a => BRAM_PortA_We,
-            bram_wrdata_a => BRAM_PortA_DIn
-        );
-
-    memory : entity work.memory
-        port map(
-            addra => x"0000" & b"0" & BRAM_PortA_Addr,
-            clka => BRAM_PortA_CLK,
-            dina => BRAM_PortA_DIn,
-            douta => BRAM_PortA_DOut,
-            ena => BRAM_PortA_En,
-            rsta => BRAM_PortA_RST,
-            wea => BRAM_PortA_We
+            RamRdData => MEM_RamRdData,
+            RamBusy => MEM_RamBusy
         );
 
     memMux : entity work.MemMux

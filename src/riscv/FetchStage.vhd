@@ -7,8 +7,10 @@ entity FetchStage is
         CLK, RST : in std_logic;
 
         PCI : in std_logic_vector (31 downto 0);
+        ThreadTagI : in integer;
 
-        PCO : out std_logic_vector (31 downto 0)
+        PCO : out std_logic_vector (31 downto 0);
+        ThreadTagO : out integer := 0
     );
 end FetchStage;
 
@@ -18,8 +20,10 @@ begin
     begin
         if RST = '0' then
             PCO <= std_logic_vector(to_signed(-4, 32));
+            ThreadTagO <= 0;
         elsif rising_edge(CLK) then
             PCO <= PCI;
+            ThreadTagO <= ThreadTagI;
         end if;
     end process;
 end Behavioral;

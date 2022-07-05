@@ -1,5 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
+use work.types.thread_tag_t;
 
 entity DecodeStage is
     port (
@@ -10,11 +11,13 @@ entity DecodeStage is
         InterlockI : in std_logic;
         ClearI : in std_logic;
         Stall : in std_logic;
+        ThreadTagI : in thread_tag_t;
 
         InstO : out std_logic_vector (31 downto 0);
         PCO : out std_logic_vector (31 downto 0);
         InterlockO : out std_logic;
-        ClearO : out std_logic
+        ClearO : out std_logic;
+        ThreadTagO : out thread_tag_t
     );
 end DecodeStage;
 
@@ -27,11 +30,13 @@ begin
             PCO <= x"00000000";
             InterlockO <= '0';
             ClearO <= '0';
+            ThreadTagO <= 0;
         elsif rising_edge(CLK) and Stall = '0' then
             InstO <= InstI;
             PCO <= PCI;
             InterlockO <= InterlockI;
             ClearO <= ClearI;
+            ThreadTagO <= ThreadTagI;
         end if;
     end process;
 end Behavioral;

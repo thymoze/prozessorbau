@@ -5,6 +5,8 @@ use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 package constants is
+    constant THREAD_COUNT : integer := 2;
+
     constant ROM_SIZE : std_logic_vector(31 downto 0) := std_logic_vector(resize(unsigned'(x"1000"), 32));
 
     constant opcode_LOAD : std_logic_vector(6 downto 0) := "0000011";

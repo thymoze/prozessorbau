@@ -11,7 +11,7 @@ architecture testbench of processor_tb is
     signal RST : std_logic;
 
 begin
-    dut : entity work.processor
+    dut : entity work.Processor
         port map(
             CLK => CLK,
             RST => RST

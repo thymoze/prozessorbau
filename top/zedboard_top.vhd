@@ -23,7 +23,7 @@ architecture structure of zedboard_top is
 begin
     BTNR_inv <= not BTNR;
 
-    processor : entity work.processor
+    dut : entity work.Processor
         port map(
             CLK => GCLK,
             RST => BTNR_inv,
