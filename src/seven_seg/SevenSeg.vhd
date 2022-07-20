@@ -14,7 +14,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.seven_seg.SevenSegData;
-use work.util.to_integer;
+use work.util.all;
 
 entity SevenSeg is
     port (
@@ -29,6 +29,7 @@ end entity;
 
 architecture rtl of SevenSeg is
     signal state : std_logic_vector (31 downto 0);
+
     signal seg1, seg2 : std_logic_vector (7 downto 0);
     signal currentDigit : std_logic;
 
@@ -60,11 +61,10 @@ begin
                 currentDigit <= not currentDigit;
             end if;
 
-            Pmod <= (
-                A => seg1(3 downto 0),
-                B => seg1(7 downto 4),
-                C => seg2(3 downto 0),
-                D => seg2(7 downto 4));
+            Pmod.A <= seg1(3 downto 0);
+            Pmod.B <= seg1(7 downto 4);
+            Pmod.C <= seg2(3 downto 0);
+            Pmod.D <= seg2(7 downto 4);
         end if;
     end process;
 

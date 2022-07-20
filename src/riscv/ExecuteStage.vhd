@@ -1,5 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
+use work.types.all;
 
 entity ExecuteStage is
     port (
@@ -21,6 +22,7 @@ entity ExecuteStage is
         SelSrc2I : in std_logic;
         Stall : in std_logic;
         Set7SegI : in std_logic;
+        ThreadTagI : in thread_tag_t;
 
         FunctO : out std_logic_vector (2 downto 0);
         SrcData1O, SrcData2O : out std_logic_vector (31 downto 0);
@@ -36,7 +38,8 @@ entity ExecuteStage is
         ClearO : out std_logic;
         ImmO : out std_logic_vector(31 downto 0);
         SelSrc2O : out std_logic;
-        Set7SegO : out std_logic
+        Set7SegO : out std_logic;
+        ThreadTagO : out thread_tag_t
     );
 end ExecuteStage;
 
@@ -61,6 +64,7 @@ begin
             ImmO <= x"00000000";
             SelSrc2O <= '0';
             Set7SegO <= '0';
+            ThreadTagO <= 0;
         elsif rising_edge(CLK) and Stall = '0' then
             FunctO <= FunctI;
             SrcData1O <= SrcData1I;
@@ -78,6 +82,7 @@ begin
             ImmO <= ImmI;
             SelSrc2O <= SelSrc2I;
             Set7SegO <= Set7SegI;
+            ThreadTagO <= ThreadTagI;
         end if;
     end process;
 

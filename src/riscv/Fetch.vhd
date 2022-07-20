@@ -15,7 +15,9 @@ entity Fetch is
 
         Jump : in std_logic;
         JumpTarget : in std_logic_vector(31 downto 0);
+        JumpThreadTag : in thread_tag_t;
         InterlockI : in std_logic;
+        InterlockThreadTag : in thread_tag_t;
         Stall : in std_logic;
 
         PC : out std_logic_vector(31 downto 0);
@@ -35,9 +37,9 @@ begin
         variable thread_pcs : thread_pc_array := (others => (others => '0'));
     begin
         if Jump = '1' then
-            pc_next := JumpTarget;
+            thread_pcs(JumpThreadTag) := JumpTarget;
         else
-            if InterlockI = '1' then
+            if InterlockI = '1' and ThreadTagI = InterlockThreadTag then
                 pc_next := PCI;
             else
                 pc_next := std_logic_vector(unsigned(PCI) + 4);
@@ -47,18 +49,18 @@ begin
         PC <= PCI;
         ThreadTagO <= ThreadTagI;
 
-        if ThreadTagI + 1 >= ThreadCount then
-            thread_tag_next := 0;
-        else
-            thread_tag_next := ThreadTagI + 1;
-        end if;
-
         if Stall = '0' then
             thread_pcs(ThreadTagI) := pc_next;
-        end if;
 
-        ThreadTagNext <= thread_tag_next;
-        PCNext <= thread_pcs(thread_tag_next);
-        ImemAddr <= thread_pcs(thread_tag_next)(11 downto 2);
+            if ThreadTagI + 1 >= ThreadCount then
+                thread_tag_next := 0;
+            else
+                thread_tag_next := ThreadTagI + 1;
+            end if;
+
+            ThreadTagNext <= thread_tag_next;
+            PCNext <= thread_pcs(thread_tag_next);
+            ImemAddr <= thread_pcs(thread_tag_next)(11 downto 2);
+        end if;
     end process;
 end Behavioral;

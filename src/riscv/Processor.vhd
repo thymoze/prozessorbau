@@ -12,7 +12,7 @@ entity Processor is
 
         SevenSeg : out SevenSegData
     );
-end processor;
+end Processor;
 
 architecture Behavioral of Processor is
     -- instruction fetch
@@ -72,6 +72,7 @@ architecture Behavioral of Processor is
     signal EX_MemAccess : std_logic;
     signal EX_MemWrEn : std_logic;
     signal EX_Set7Seg : std_logic;
+    signal EX_ThreadTag : thread_tag_t;
 
     signal EX_IF_Jump : std_logic;
     signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
@@ -89,6 +90,7 @@ architecture Behavioral of Processor is
     -- mem
     signal MEM_Funct : std_logic_vector (2 downto 0);
     signal MEM_Stall : std_logic;
+    signal MEM_ThreadTag : thread_tag_t;
     signal MEM_DestData : std_logic_vector (31 downto 0);
     signal MEM_DestWrEn : std_logic;
     signal MEM_DestRegNo : std_logic_vector (4 downto 0);
@@ -128,7 +130,9 @@ begin
             PCI => IF_PC,
             Jump => EX_IF_Jump,
             JumpTarget => EX_IF_JumpTarget,
+            JumpThreadTag => EX_ThreadTag,
             InterlockI => ID_IF_Interlock,
+            InterlockThreadTag => ID_ThreadTag,
             Stall => MEM_Stall,
 
             PCNext => IF_PCNext,
@@ -209,8 +213,13 @@ begin
         port map(
             SrcRegNo1 => ID_SrcReg1, SrcRegNo2 => ID_SrcReg2,
             SrcData1 => ID_RegData1, SrcData2 => ID_RegData2,
+            ThreadTag => ID_ThreadTag,
+
             DestWrEn_EX => EX_DestWrEn, DestRegNo_EX => EX_DestRegNo, DestData_EX => EX_DestData,
+            ThreadTag_EX => EX_ThreadTag,
+
             DestWrEn_MEM => MEM_DestWrEn, DestRegNo_MEM => MEM_DestRegNo, DestData_MEM => MEM_ID_WrData,
+            ThreadTag_MEM => MEM_ThreadTag,
 
             FwdData1 => ID_EX_Data1, FwdData2 => ID_EX_Data2
         );
@@ -234,6 +243,7 @@ begin
             JumpI => ID_EX_Jump, JumpRelI => ID_EX_JumpRel, JumpTargetI => ID_EX_JumpTarget,
             ClearI => EX_JumpO,
             Set7SegI => ID_EX_Set7Seg,
+            ThreadTagI => ID_ThreadTag,
 
             FunctO => EX_Funct,
             AuxO => EX_Aux,
@@ -245,7 +255,8 @@ begin
             PCNextO => EX_PCNext,
             JumpO => EX_Jump, JumpRelO => EX_JumpRel, JumpTargetO => EX_JumpTarget,
             ClearO => EX_Clear,
-            Set7SegO => EX_Set7Seg
+            Set7SegO => EX_Set7Seg,
+            ThreadTagO => EX_ThreadTag
         );
 
     immOrReg : entity work.MUX
@@ -298,6 +309,7 @@ begin
 
             StallI => MEM_Stall,
             FunctI => EX_MEM_Funct,
+            ThreadTagI => EX_ThreadTag,
             DestWrEnI => EX_MEM_DestWrEn, DestRegNoI => EX_MEM_DestRegNo, DestDataI => EX_DestData,
             MemWrData => EX_MEM_WrData, MemAccessI => EX_MEM_MemAccess, MemByteEna => EX_MEM_ByteEna,
             RamRdData => MEM_RamRdData,
@@ -308,7 +320,8 @@ begin
             RamReadEn => MEM_RamReadEn, RamWriteEn => MEM_RamWriteEn, RamByteEna => MEM_RamByteEna,
             RamAddress => MEM_RamAddress, RamWrData => MEM_RamWrData,
             FunctO => MEM_Funct,
-            StallO => MEM_Stall
+            StallO => MEM_Stall,
+            ThreadTagO => MEM_ThreadTag
         );
 
     mem : entity work.Mem

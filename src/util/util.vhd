@@ -4,6 +4,8 @@ use IEEE.numeric_std.all;
 
 package util is
 
+    attribute mark_debug : string;
+
     function to_integer(x : std_logic) return integer;
 
 end package;
