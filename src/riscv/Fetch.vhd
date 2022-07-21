@@ -49,7 +49,11 @@ begin
         PC <= PCI;
         ThreadTagO <= ThreadTagI;
 
-        if Stall = '0' then
+        if Stall = '1' then
+            ThreadTagNext <= ThreadTagI;
+            PCNext <= PCI;
+            ImemAddr <= PCI(11 downto 2);
+        else
             thread_pcs(ThreadTagI) := pc_next;
 
             if ThreadTagI + 1 >= ThreadCount then
