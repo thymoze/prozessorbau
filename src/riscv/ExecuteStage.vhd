@@ -17,11 +17,12 @@ entity ExecuteStage is
         JumpTargetI : in std_logic_vector (31 downto 0);
         MemAccessI : in std_logic;
         MemWrEnI : in std_logic;
-        ClearI : in std_logic;
+        ClearI : in thread_logic;
         ImmI : in std_logic_vector(31 downto 0);
         SelSrc2I : in std_logic;
         Stall : in std_logic;
         Set7SegI : in std_logic;
+        SetThreadTagI : in std_logic;
         ThreadTagI : in thread_tag_t;
 
         FunctO : out std_logic_vector (2 downto 0);
@@ -35,10 +36,11 @@ entity ExecuteStage is
         JumpTargetO : out std_logic_vector (31 downto 0);
         MemAccessO : out std_logic;
         MemWrEnO : out std_logic;
-        ClearO : out std_logic;
+        ClearO : out thread_logic;
         ImmO : out std_logic_vector(31 downto 0);
         SelSrc2O : out std_logic;
         Set7SegO : out std_logic;
+        SetThreadTagO : out std_logic;
         ThreadTagO : out thread_tag_t
     );
 end ExecuteStage;
@@ -60,10 +62,11 @@ begin
             JumpTargetO <= x"00000000";
             MemAccessO <= '0';
             MemWrEnO <= '0';
-            ClearO <= '0';
+            ClearO <= (ThreadTag => 0, Value => '0');
             ImmO <= x"00000000";
             SelSrc2O <= '0';
             Set7SegO <= '0';
+            SetThreadTagO <= '0';
             ThreadTagO <= 0;
         elsif rising_edge(CLK) and Stall = '0' then
             FunctO <= FunctI;
@@ -82,6 +85,7 @@ begin
             ImmO <= ImmI;
             SelSrc2O <= SelSrc2I;
             Set7SegO <= Set7SegI;
+            SetThreadTagO <= SetThreadTagI;
             ThreadTagO <= ThreadTagI;
         end if;
     end process;

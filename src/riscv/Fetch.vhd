@@ -13,11 +13,9 @@ entity Fetch is
 
         ThreadTagI : in thread_tag_t;
 
-        Jump : in std_logic;
+        Jump : in thread_logic;
         JumpTarget : in std_logic_vector(31 downto 0);
-        JumpThreadTag : in thread_tag_t;
-        InterlockI : in std_logic;
-        InterlockThreadTag : in thread_tag_t;
+        Interlock : in thread_logic;
         Stall : in std_logic;
 
         PC : out std_logic_vector(31 downto 0);
@@ -31,17 +29,19 @@ end Fetch;
 architecture Behavioral of Fetch is
     type thread_pc_array is array (0 to ThreadCount - 1) of std_logic_vector(31 downto 0);
 begin
-    process (PCI, Jump, JumpTarget, InterlockI, Stall, ThreadTagI)
+    process (PCI, Jump, JumpTarget, Interlock, Stall, ThreadTagI)
         variable thread_tag_next : thread_tag_t;
         variable thread_pc_next : thread_pc_array := (others => (others => '0'));
     begin
         PC <= PCI;
         ThreadTagO <= ThreadTagI;
 
-        if Jump = '1' then
-            thread_pc_next(JumpThreadTag) := JumpTarget;
-        else
-            if InterlockI = '1' and ThreadTagI = InterlockThreadTag then
+        if Jump.Value = '1' then
+            thread_pc_next(Jump.ThreadTag) := JumpTarget;
+        end if;
+
+        if Jump.Value = '0' or Jump.ThreadTag /= ThreadTagI then
+            if (Interlock.Value = '1' and ThreadTagI = Interlock.ThreadTag) then
                 thread_pc_next(ThreadTagI) := PCI;
             else
                 thread_pc_next(ThreadTagI) := std_logic_vector(unsigned(PCI) + 4);

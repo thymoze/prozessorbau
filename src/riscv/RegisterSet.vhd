@@ -29,10 +29,10 @@ entity RegisterSet is
     port (
         CLK, RST : in std_logic;
 
-        ThreadTag : in thread_tag_t;
-
+        RdThreadTag : in thread_tag_t;
         RdRegNo1, RdRegNo2 : in std_logic_vector (4 downto 0);
 
+        WrThreadTag : in thread_tag_t;
         WrEn : in std_logic;
         WrRegNo : in std_logic_vector (4 downto 0);
         WrData : in std_logic_vector (31 downto 0);
@@ -53,14 +53,14 @@ begin
             RegisterSets <= (others => (1 => x"00000001", others => x"00000000"));
         elsif rising_edge(CLK) then
             if WrEn = '1' and unsigned(WrRegNo) /= 0 then
-                RegisterSets(ThreadTag)(to_integer(unsigned(WrRegNo))) <= WrData;
+                RegisterSets(WrThreadTag)(to_integer(unsigned(WrRegNo))) <= WrData;
             end if;
         end if;
     end process;
 
-    process (RegisterSets, RdRegNo1, RdRegNo2)
+    process (RegisterSets, RdRegNo1, RdRegNo2, RdThreadTag)
     begin
-        RdData1 <= RegisterSets(ThreadTag)(to_integer(unsigned(RdRegNo1)));
-        RdData2 <= RegisterSets(ThreadTag)(to_integer(unsigned(RdRegNo2)));
+        RdData1 <= RegisterSets(RdThreadTag)(to_integer(unsigned(RdRegNo1)));
+        RdData2 <= RegisterSets(RdThreadTag)(to_integer(unsigned(RdRegNo2)));
     end process;
 end Behavioral;

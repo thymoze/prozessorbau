@@ -3,6 +3,7 @@ use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
 
 use work.constants.all;
+use work.types.all;
 
 entity ALU is
     port (
@@ -19,11 +20,13 @@ entity ALU is
         SrcData2 : in std_logic_vector(31 downto 0);
         DestRegNoI : in std_logic_vector(4 downto 0);
         DestWrEnI : in std_logic;
-        Clear : in std_logic;
+        Clear : in thread_logic;
+        ThreadTag : in thread_tag_t;
+        SetThreadTag : in std_logic;
 
         FunctO : out std_logic_vector (2 downto 0);
         X : out std_logic_vector(31 downto 0);
-        JumpO : out std_logic;
+        JumpO : out thread_logic;
         JumpTargetO : out std_logic_vector(31 downto 0);
         DestRegNoO : out std_logic_vector(4 downto 0);
         DestWrEnO : out std_logic;
@@ -118,9 +121,13 @@ begin
             end if;
         end if;
 
+        if SetThreadTag = '1' then
+            result := std_logic_vector(to_unsigned(ThreadTag, 32));
+        end if;
+
         X <= result;
 
-        JumpO <= JumpI;
+        JumpO <= (ThreadTag => ThreadTag, Value => JumpI);
         JumpTargetO <= JumpTargetI;
         if JumpI = '1' then
             -- unconditional jump
@@ -132,9 +139,9 @@ begin
             -- conditional jump / branch
             if JumpRelI = '1' then
                 if branch_cond then
-                    JumpO <= '1';
+                    JumpO <= (ThreadTag => ThreadTag, Value => '1');
                 else
-                    JumpO <= '0';
+                    JumpO <= (ThreadTag => ThreadTag, Value => '0');
                 end if;
             end if;
         end if;
@@ -144,11 +151,11 @@ begin
 
         FunctO <= FunctI;
 
-        if Clear = '1' then
+        if Clear.Value = '1' and Clear.ThreadTag = ThreadTag then
             MemAccessO <= '0';
             MemByteEna <= "0000";
             DestWrEnO <= '0';
-            JumpO <= '0';
+            JumpO <= (ThreadTag => ThreadTag, Value => '0');
         end if;
     end process;
 end Behavioral;

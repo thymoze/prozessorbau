@@ -5,7 +5,7 @@ use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 package constants is
-    constant THREAD_COUNT : integer := 1;
+    constant THREAD_COUNT : integer := 4;
 
     constant ROM_SIZE : std_logic_vector(31 downto 0) := std_logic_vector(resize(unsigned'(x"1000"), 32));
 

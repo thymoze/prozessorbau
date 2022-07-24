@@ -10,4 +10,9 @@ package types is
     subtype register_t is std_logic_vector (4 downto 0);
     subtype opcode_t is std_logic_vector (6 downto 0);
 
+    type thread_logic is record
+        ThreadTag : thread_tag_t;
+        Value : std_logic;
+    end record;
+
 end package;

@@ -9,8 +9,9 @@ entity Decode is
     port (
         Inst : in std_logic_vector (31 downto 0);
         PC : in std_logic_vector (31 downto 0);
-        Clear : in std_logic;
-        InterlockI : in std_logic;
+        Clear : in thread_logic;
+        InterlockI : in thread_logic;
+        ThreadTag : in thread_tag_t;
 
         Funct : out std_logic_vector (2 downto 0);
         SrcRegNo1, SrcRegNo2 : out std_logic_vector (4 downto 0);
@@ -24,10 +25,11 @@ entity Decode is
         MemAccess : out std_logic;
         MemWrEn : out std_logic;
 
-        InterlockO : out std_logic;
+        InterlockO : out thread_logic;
         Imm : out std_logic_vector (31 downto 0);
         SelSrc2 : out std_logic;
-        Set7Seg : out std_logic
+        Set7Seg : out std_logic;
+        SetThreadTag : out std_logic
     );
 end Decode;
 
@@ -160,10 +162,11 @@ begin
         JumpTarget <= (others => '0');
         MemAccess <= '0';
         MemWrEn <= '0';
-        InterlockO <= '0';
+        InterlockO <= (ThreadTag => ThreadTag, Value => '0');
         Imm <= (others => '0');
         SelSrc2 <= '0';
         Set7Seg <= '0';
+        SetThreadTag <= '0';
 
         case opcode is
             when opcode_OP =>
@@ -239,7 +242,7 @@ begin
                 SrcRegNo1 <= decoded_i.rs1;
                 DestRegNo <= decoded_i.rd;
                 DestWrEn <= '1';
-                InterlockO <= '1';
+                InterlockO <= (ThreadTag => ThreadTag, Value => '1');
 
             when opcode_STORE =>
                 decoded_s := parse_s_type(Inst);
@@ -255,6 +258,7 @@ begin
             when opcode_SYSTEM =>
                 decoded_i := parse_i_type(Inst);
 
+                Imm <= std_logic_vector(resize(unsigned(decoded_i.imm), 32));
                 SrcRegNo1 <= decoded_i.rs1;
                 DestRegNo <= decoded_i.rd;
                 DestWrEn <= '1';
@@ -263,11 +267,16 @@ begin
                     Set7Seg <= '1';
                 end if;
 
+                if decoded_i.funct3 = "010" and decoded_i.rs1 = "00000" and decoded_i.imm = x"71D" then
+                    SetThreadTag <= '1';
+                end if;
+
             when others => null;
         end case;
 
-        if Clear = '1' or InterlockI = '1' then
-            InterlockO <= '0';
+        if (Clear.ThreadTag = ThreadTag and Clear.Value = '1')
+            or (InterlockI.ThreadTag = ThreadTag and InterlockI.Value = '1') then
+            InterlockO <= (ThreadTag => ThreadTag, Value => '0');
             MemAccess <= '0';
             MemWrEn <= '0';
             DestWrEn <= '0';
