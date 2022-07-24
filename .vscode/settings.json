@@ -1,6 +1,9 @@
 {
     "editor.fontLigatures": false,
-    "editor.formatOnSave": true,
+    "[vhdl]": {
+        "files.encoding": "utf8",
+        "editor.formatOnSave": true
+    },
     "vhdl.formatter.case.keyword": "LowerCase",
     "vhdl.formatter.case.typename": "LowerCase",
     "vhdl.formatter.insertFinalNewline": true
