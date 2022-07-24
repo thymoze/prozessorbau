@@ -77,7 +77,6 @@ begin
                     if MemAccessI = '1' and DestDataI >= ROM_SIZE then
                         RamAddress <= DestDataI(31 downto 2) & b"00"; -- set lowest two bits to 0 to ensure alignment
                         StallO <= '1';
-                        DestWrEnO <= '0';
 
                         if MemByteEna = "0000" then
                             current_state <= Read;
@@ -96,7 +95,6 @@ begin
                         StallO <= '0';
                         current_state <= Idle;
                         MemRdData <= RamRdData;
-                        DestWrEnO <= DestWrEnI;
                     end if;
 
                 when Write =>

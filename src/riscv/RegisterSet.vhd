@@ -28,6 +28,7 @@ entity RegisterSet is
     );
     port (
         CLK, RST : in std_logic;
+        Stall : in std_logic;
 
         RdThreadTag : in thread_tag_t;
         RdRegNo1, RdRegNo2 : in std_logic_vector (4 downto 0);
@@ -51,7 +52,7 @@ begin
     begin
         if (RST = '0') then
             RegisterSets <= (others => (1 => x"00000001", others => x"00000000"));
-        elsif rising_edge(CLK) then
+        elsif rising_edge(CLK) and Stall = '0' then
             if WrEn = '1' and unsigned(WrRegNo) /= 0 then
                 RegisterSets(WrThreadTag)(to_integer(unsigned(WrRegNo))) <= WrData;
             end if;

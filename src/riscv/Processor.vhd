@@ -204,6 +204,7 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
+            Stall => MEM_Stall,
             RdThreadTag => ID_ThreadTag,
             RdRegNo1 => ID_SrcReg1, RdRegNo2 => ID_SrcReg2,
             WrThreadTag => MEM_ID_ThreadTag,

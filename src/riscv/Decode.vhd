@@ -176,6 +176,7 @@ begin
                 Funct <= decoded_r.funct3;
                 SrcRegNo1 <= decoded_r.rs1;
                 SrcRegNo2 <= decoded_r.rs2;
+                SelSrc2 <= '1';
                 DestRegNo <= decoded_r.rd;
                 DestWrEn <= '1';
 
