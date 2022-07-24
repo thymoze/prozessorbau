@@ -72,11 +72,12 @@ begin
 
             case current_state is
                 when Idle =>
-                    MemRdData <= (others => '0'); -- TODO: For some reason this gets written to the register
+                    MemRdData <= (others => '0');
                     -- addresses < ROM_SIZE go to the rom, not the ram, and complete in 1 cycle
                     if MemAccessI = '1' and DestDataI >= ROM_SIZE then
                         RamAddress <= DestDataI(31 downto 2) & b"00"; -- set lowest two bits to 0 to ensure alignment
                         StallO <= '1';
+                        DestWrEnO <= '0';
 
                         if MemByteEna = "0000" then
                             current_state <= Read;
@@ -95,6 +96,7 @@ begin
                         StallO <= '0';
                         current_state <= Idle;
                         MemRdData <= RamRdData;
+                        DestWrEnO <= DestWrEnI;
                     end if;
 
                 when Write =>

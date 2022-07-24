@@ -2,6 +2,8 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+use work.constants.THREAD_COUNT;
+
 entity FetchStage is
     port (
         CLK, RST : in std_logic;
@@ -20,7 +22,7 @@ begin
     begin
         if RST = '0' then
             PCO <= std_logic_vector(to_signed(-4, 32));
-            ThreadTagO <= 0;
+            ThreadTagO <= THREAD_COUNT - 1;
         elsif rising_edge(CLK) then
             PCO <= PCI;
             ThreadTagO <= ThreadTagI;
