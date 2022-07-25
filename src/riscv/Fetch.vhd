@@ -11,6 +11,7 @@ entity Fetch is
         ThreadStart : thread_start_t
     );
     port (
+        RST : in std_logic;
         PCI : in std_logic_vector(31 downto 0);
 
         ThreadTagI : in thread_tag_t;
@@ -41,7 +42,7 @@ architecture Behavioral of Fetch is
         end case;
     end function;
 begin
-    process (PCI, Jump, JumpTarget, Interlock, Stall, ThreadTagI)
+    process (RST, PCI, Jump, JumpTarget, Interlock, Stall, ThreadTagI)
         variable thread_tag_next : thread_tag_t;
         variable thread_pc_next : thread_pc_array := init_thread_pc_array(ThreadStart);
     begin
@@ -77,6 +78,10 @@ begin
             ThreadTagNext <= thread_tag_next;
             PCNext <= thread_pc_next(thread_tag_next);
             ImemAddr <= thread_pc_next(thread_tag_next)(11 downto 2);
+        end if;
+
+        if RST = '0' then
+            thread_pc_next := init_thread_pc_array(ThreadStart);
         end if;
     end process;
 end Behavioral;

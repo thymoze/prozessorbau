@@ -142,6 +142,7 @@ begin
             ThreadStart => ThreadStart
         )
         port map(
+            RST => RST,
             ThreadTagI => IF_ThreadTag,
             PCI => IF_PC,
             Jump => EX_JumpO,
