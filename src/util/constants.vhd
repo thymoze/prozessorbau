@@ -5,7 +5,7 @@ use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 package constants is
-    constant THREAD_COUNT : integer := 1;
+    constant THREAD_COUNT : integer := 4;
 
     constant ROM_SIZE : std_logic_vector(31 downto 0) := std_logic_vector(resize(unsigned'(x"1000"), 32));
 
@@ -48,4 +48,15 @@ package constants is
     constant funct_LH : std_logic_vector(2 downto 0) := "001";
     constant funct_LHU : std_logic_vector(2 downto 0) := "101";
     constant funct_LW : std_logic_vector(2 downto 0) := "010";
+
+    constant funct_CSRW : std_logic_vector(2 downto 0) := "001";
+    constant funct_CSRR : std_logic_vector(2 downto 0) := "010";
+
+    constant reg_zero : std_logic_vector(4 downto 0) := "00000";
+    constant reg_ra : std_logic_vector(4 downto 0) := "00001";
+    constant reg_sp : std_logic_vector(4 downto 0) := "00010";
+
+    constant csr_SevenSeg : std_logic_vector(11 downto 0) := x"788";
+    constant csr_SpawnThread : std_logic_vector(11 downto 0) := x"700";
+    constant csr_ThreadID : std_logic_vector(11 downto 0) := x"71D";
 end constants;

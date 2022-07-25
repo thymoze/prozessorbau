@@ -6,6 +6,11 @@ use work.types.all;
 use work.seven_seg.all;
 
 entity Processor is
+    generic (
+        ThreadCount : integer := THREAD_COUNT;
+        ThreadStart : thread_start_t := spawn;
+        ThreadScheduling : scheduling_t := round_robin
+    );
     port (
         CLK : in std_logic;
         RST : in std_logic;
@@ -54,6 +59,7 @@ architecture Behavioral of Processor is
     signal ID_EX_MemWrEn : std_logic;
     signal ID_EX_Set7Seg : std_logic;
     signal ID_EX_SetThreadTag : std_logic;
+    signal ID_EX_SpawnThread : thread_tag_t;
 
     -- execute
     signal EX_SrcData1, EX_SrcData2, EX_Data2 : std_logic_vector(31 downto 0);
@@ -75,10 +81,13 @@ architecture Behavioral of Processor is
     signal EX_Set7Seg : std_logic;
     signal EX_ThreadTag : thread_tag_t;
     signal EX_SetThreadTag : std_logic;
+    signal EX_SpawnThread : thread_tag_t;
 
     signal EX_IF_Jump : thread_logic;
     signal EX_IF_JumpTarget : std_logic_vector (31 downto 0);
     signal EX_IF_MemAccess : std_logic;
+    signal EX_IF_SpawnThread : thread_tag_t;
+    signal EX_IF_SpawnTarget : std_logic_vector (31 downto 0);
 
     signal EX_ID_Jump : thread_logic;
 
@@ -113,6 +122,9 @@ begin
     -- INSTRUCTION FETCH --
     -----------------------
     fetchStage : entity work.FetchStage
+        generic map(
+            ThreadStart => ThreadStart
+        )
         port map(
             CLK => CLK, RST => RST,
 
@@ -125,7 +137,9 @@ begin
 
     fetch : entity work.Fetch
         generic map(
-            ThreadCount => THREAD_COUNT
+            ThreadCount => ThreadCount,
+            ThreadScheduling => ThreadScheduling,
+            ThreadStart => ThreadStart
         )
         port map(
             ThreadTagI => IF_ThreadTag,
@@ -134,6 +148,8 @@ begin
             JumpTarget => EX_IF_JumpTarget,
             Interlock => ID_IF_Interlock,
             Stall => MEM_Stall,
+            SpawnThread => EX_IF_SpawnThread,
+            SpawnTarget => EX_IF_SpawnTarget,
 
             PCNext => IF_PCNext,
             ThreadTagNext => IF_ThreadTagNext,
@@ -176,6 +192,9 @@ begin
         );
 
     decode : entity work.Decode
+        generic map(
+            ThreadCount => ThreadCount
+        )
         port map(
             Inst => ID_Inst,
             PC => ID_PC,
@@ -194,12 +213,13 @@ begin
             MemAccess => ID_EX_MemAccess, MemWrEn => ID_EX_MemWrEn,
             InterlockO => ID_IF_Interlock,
             Set7Seg => ID_EX_Set7Seg,
-            SetThreadTag => ID_EX_SetThreadTag
+            SetThreadTag => ID_EX_SetThreadTag,
+            SpawnThread => ID_EX_SpawnThread
         );
 
     regset : entity work.RegisterSet
         generic map(
-            ThreadCount => THREAD_COUNT
+            ThreadCount => ThreadCount
         )
         port map(
             CLK => CLK, RST => RST,
@@ -249,6 +269,7 @@ begin
             Set7SegI => ID_EX_Set7Seg,
             ThreadTagI => ID_ThreadTag,
             SetThreadTagI => ID_EX_SetThreadTag,
+            SpawnThreadI => ID_EX_SpawnThread,
 
             FunctO => EX_Funct,
             AuxO => EX_Aux,
@@ -262,7 +283,8 @@ begin
             ClearO => EX_Clear,
             Set7SegO => EX_Set7Seg,
             ThreadTagO => EX_ThreadTag,
-            SetThreadTagO => EX_SetThreadTag
+            SetThreadTagO => EX_SetThreadTag,
+            SpawnThreadO => EX_SpawnThread
         );
 
     immOrReg : entity work.MUX
@@ -285,12 +307,14 @@ begin
             Clear => EX_Clear,
             ThreadTag => EX_ThreadTag,
             SetThreadTag => EX_SetThreadTag,
+            SpawnThreadI => EX_SpawnThread,
 
             X => EX_DestData,
             FunctO => EX_MEM_Funct,
             DestWrEnO => EX_MEM_DestWrEn, DestRegNoO => EX_MEM_DestRegNo,
             JumpO => EX_JumpO, JumpTargetO => EX_IF_JumpTarget,
-            MemWrData => EX_MEM_WrData, MemAccessO => EX_MEM_MemAccess, MemByteEna => EX_MEM_ByteEna
+            MemWrData => EX_MEM_WrData, MemAccessO => EX_MEM_MemAccess, MemByteEna => EX_MEM_ByteEna,
+            SpawnThreadO => EX_IF_SpawnThread, SpawnTargetO => EX_IF_SpawnTarget
         );
 
     -- EX_IF_Jump <= EX_JumpO;

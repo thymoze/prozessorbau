@@ -6,6 +6,9 @@ use work.constants.all;
 use work.types.all;
 
 entity Decode is
+    generic (
+        ThreadCount : integer
+    );
     port (
         Inst : in std_logic_vector (31 downto 0);
         PC : in std_logic_vector (31 downto 0);
@@ -29,7 +32,8 @@ entity Decode is
         Imm : out std_logic_vector (31 downto 0);
         SelSrc2 : out std_logic;
         Set7Seg : out std_logic;
-        SetThreadTag : out std_logic
+        SetThreadTag : out std_logic;
+        SpawnThread : out thread_tag_t
     );
 end Decode;
 
@@ -167,6 +171,7 @@ begin
         SelSrc2 <= '0';
         Set7Seg <= '0';
         SetThreadTag <= '0';
+        SpawnThread <= 0;
 
         case opcode is
             when opcode_OP =>
@@ -264,11 +269,22 @@ begin
                 DestRegNo <= decoded_i.rd;
                 DestWrEn <= '1';
 
-                if decoded_i.funct3 = "001" and decoded_i.rd = "00000" and decoded_i.imm = x"788" then
+                -- csrw Set7Set
+                if decoded_i.funct3 = funct_CSRW and decoded_i.rd = reg_zero and decoded_i.imm = csr_SevenSeg then
                     Set7Seg <= '1';
                 end if;
 
-                if decoded_i.funct3 = "010" and decoded_i.rs1 = "00000" and decoded_i.imm = x"71D" then
+                -- csrw SpawnThread
+                for t in 1 to ThreadCount - 1 loop
+                    if decoded_i.funct3 = funct_CSRW
+                        and decoded_i.rd = reg_zero
+                        and decoded_i.imm = std_logic_vector(unsigned(csr_SpawnThread) + to_unsigned(t, 12)) then
+                        SpawnThread <= t;
+                    end if;
+                end loop;
+
+                -- csrr ThreadTag
+                if decoded_i.funct3 = funct_CSRR and decoded_i.rs1 = reg_zero and decoded_i.imm = csr_ThreadID then
                     SetThreadTag <= '1';
                 end if;
 
@@ -283,6 +299,7 @@ begin
             DestWrEn <= '0';
             Jump <= '0';
             JumpRel <= '0';
+            SpawnThread <= 0;
         end if;
     end process;
 end Behavioral;

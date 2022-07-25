@@ -7,6 +7,9 @@ package types is
 
     subtype thread_tag_t is integer range 0 to THREAD_COUNT - 1;
 
+    type scheduling_t is (round_robin);
+    type thread_start_t is (start_0, spawn);
+
     subtype register_t is std_logic_vector (4 downto 0);
     subtype opcode_t is std_logic_vector (6 downto 0);
 

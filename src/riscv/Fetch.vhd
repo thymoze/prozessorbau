@@ -6,7 +6,9 @@ use work.constants.all;
 
 entity Fetch is
     generic (
-        ThreadCount : integer
+        ThreadCount : integer;
+        ThreadScheduling : scheduling_t;
+        ThreadStart : thread_start_t
     );
     port (
         PCI : in std_logic_vector(31 downto 0);
@@ -15,6 +17,8 @@ entity Fetch is
 
         Jump : in thread_logic;
         JumpTarget : in std_logic_vector(31 downto 0);
+        SpawnThread : in thread_tag_t;
+        SpawnTarget : in std_logic_vector(31 downto 0);
         Interlock : in thread_logic;
         Stall : in std_logic;
 
@@ -28,16 +32,26 @@ end Fetch;
 
 architecture Behavioral of Fetch is
     type thread_pc_array is array (0 to ThreadCount - 1) of std_logic_vector(31 downto 0);
+
+    function init_thread_pc_array(ThreadStart : thread_start_t) return thread_pc_array is
+    begin
+        case ThreadStart is
+            when start_0 => return (others => (others => '0'));
+            when spawn => return (0 => (others => '0'), others => std_logic_vector(to_signed(-4, 32)));
+        end case;
+    end function;
 begin
     process (PCI, Jump, JumpTarget, Interlock, Stall, ThreadTagI)
         variable thread_tag_next : thread_tag_t;
-        variable thread_pc_next : thread_pc_array := (others => (others => '0'));
+        variable thread_pc_next : thread_pc_array := init_thread_pc_array(ThreadStart);
     begin
         PC <= PCI;
         ThreadTagO <= ThreadTagI;
 
         if Jump.Value = '1' then
             thread_pc_next(Jump.ThreadTag) := JumpTarget;
+        elsif SpawnThread /= 0 then
+            thread_pc_next(SpawnThread) := SpawnTarget;
         end if;
 
         if Jump.Value = '0' or Jump.ThreadTag /= ThreadTagI then
@@ -53,11 +67,12 @@ begin
             PCNext <= PCI;
             ImemAddr <= PCI(11 downto 2);
         else
-            if ThreadTagI + 1 >= ThreadCount then
-                thread_tag_next := 0;
-            else
-                thread_tag_next := ThreadTagI + 1;
-            end if;
+            for i in 1 to ThreadCount loop
+                thread_tag_next := (i + ThreadTagI) mod ThreadCount;
+                if signed(thread_pc_next(thread_tag_next)) /= to_signed(-4, 32) then
+                    exit;
+                end if;
+            end loop;
 
             ThreadTagNext <= thread_tag_next;
             PCNext <= thread_pc_next(thread_tag_next);

@@ -24,6 +24,7 @@ entity ExecuteStage is
         Set7SegI : in std_logic;
         SetThreadTagI : in std_logic;
         ThreadTagI : in thread_tag_t;
+        SpawnThreadI : in thread_tag_t;
 
         FunctO : out std_logic_vector (2 downto 0);
         SrcData1O, SrcData2O : out std_logic_vector (31 downto 0);
@@ -41,7 +42,8 @@ entity ExecuteStage is
         SelSrc2O : out std_logic;
         Set7SegO : out std_logic;
         SetThreadTagO : out std_logic;
-        ThreadTagO : out thread_tag_t
+        ThreadTagO : out thread_tag_t;
+        SpawnThreadO : out thread_tag_t
     );
 end ExecuteStage;
 
@@ -68,6 +70,7 @@ begin
             Set7SegO <= '0';
             SetThreadTagO <= '0';
             ThreadTagO <= 0;
+            SpawnThreadO <= 0;
         elsif rising_edge(CLK) and Stall = '0' then
             FunctO <= FunctI;
             SrcData1O <= SrcData1I;
@@ -87,6 +90,7 @@ begin
             Set7SegO <= Set7SegI;
             SetThreadTagO <= SetThreadTagI;
             ThreadTagO <= ThreadTagI;
+            SpawnThreadO <= SpawnThreadI;
         end if;
     end process;
 

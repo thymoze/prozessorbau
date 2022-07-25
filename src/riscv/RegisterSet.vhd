@@ -51,7 +51,7 @@ begin
     process (CLK, RST)
     begin
         if (RST = '0') then
-            RegisterSets <= (others => (1 => x"00000001", others => x"00000000"));
+            RegisterSets <= (0 => (others => x"00000000"), others => (1 => std_logic_vector(to_signed(-4, 32)), others => x"00000000"));
         elsif rising_edge(CLK) and Stall = '0' then
             if WrEn = '1' and unsigned(WrRegNo) /= 0 then
                 RegisterSets(WrThreadTag)(to_integer(unsigned(WrRegNo))) <= WrData;

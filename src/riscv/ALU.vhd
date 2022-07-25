@@ -23,6 +23,7 @@ entity ALU is
         Clear : in thread_logic;
         ThreadTag : in thread_tag_t;
         SetThreadTag : in std_logic;
+        SpawnThreadI : in thread_tag_t;
 
         FunctO : out std_logic_vector (2 downto 0);
         X : out std_logic_vector(31 downto 0);
@@ -32,7 +33,9 @@ entity ALU is
         DestWrEnO : out std_logic;
         MemAccessO : out std_logic;
         MemWrData : out std_logic_vector(31 downto 0);
-        MemByteEna : out std_logic_vector(3 downto 0)
+        MemByteEna : out std_logic_vector(3 downto 0);
+        SpawnThreadO : out thread_tag_t;
+        SpawnTargetO : out std_logic_vector(31 downto 0)
     );
 end ALU;
 
@@ -123,6 +126,13 @@ begin
 
         if SetThreadTag = '1' then
             result := std_logic_vector(to_unsigned(ThreadTag, 32));
+        end if;
+
+        SpawnThreadO <= SpawnThreadI;
+        if SpawnThreadI /= 0 then
+            SpawnTargetO <= A;
+        else
+            SpawnTargetO <= (others => '0');
         end if;
 
         X <= result;
