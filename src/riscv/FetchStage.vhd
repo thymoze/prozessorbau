@@ -25,7 +25,7 @@ architecture Behavioral of FetchStage is
         variable result : thread_pc_array_t;
     begin
         for i in 0 to THREAD_COUNT - 1 loop
-            result(i) := std_logic_vector(to_unsigned(i * 100, 32));
+            result(i) := std_logic_vector(resize(i * unsigned'(x"100"), 32));
         end loop;
         return result;
     end function;
