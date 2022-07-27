@@ -18,7 +18,9 @@ Zum generieren und öffnen des Projekts:
 ```bash
 $ vivado -mode tcl -source scripts/project.tcl
 ```
-Achtung: Ein vorhandenes Projekt wird dabei überschrieben. Für ein bereits generiertes Projekt kann man in Vivado die `scripts/project/risc.xpr` öffnen.
+Achtung: Ein vorhandenes Projekt wird dabei überschrieben. Für ein bereits generiertes Projekt kann man in Vivado die Datei `scripts/project/risc.xpr` öffnen.
+
+Zusätzlich zum Projekt werden auch die verwendeten IP-Module per Skript generiert. Bei Ausführung der `project.tcl` wird automatisch auch das `ip.tcl` Skript ausgeführt, welches die Konfiguration der IP-Module beschreibt. Bei Änderungen an einer Konfiguration muss der Ordner des Moduls unter `scripts/ip/[name]` gelöscht werden, damit das Modul neu generiert wird.
 
 ## Dokumentation
 
@@ -34,12 +36,16 @@ Es gibt zwei verschiedene Ansätze für Multithreading bei einer Single-Issue CP
 * Course-grained Multithreading
   > Wechselt zwischen den Threads nur bei längeren, kostspieligen Stalls. Dadurch wird der Prozessor bei Stall-freien Ausführungen weniger verlangsamt, allerdings wird bei jedem Thread-Wechsel ein Pipeline-Bubble benötigt. 
 
-Dieser Prozessor implementiert Fine-grained Multithreading mit Round Robin. Es gibt mehrere Konfigurationsmöglichkeiten als Generic-Parameter an die `Processor` Entität:
-* Anzahl Threads: Die Anzahl der Threads ist frei konfigurierbar
-* Thread Start:
-    * `start_0`: Alle Threads werden gestartet und führen die selben Instruktionen, beginnend bei Adresse 0, aus.
-    * `start_offset`: Alle Threads werden gestartet, führen jedoch unterschiedliche Instruktionen aus, beginnend bei einem festen Offset (z.B. Thread 0 bei 0, Thread 1 bei 100)
-    * `spawn`: Nur Thread 0 wird gestartet und kann weitere Threads mit einer speziellen Instruktion an einer bestimmten Adresse starten. (s. [_Zusätzliche Instruktionen_](#zusätzliche-instruktionen))
+Dieser Prozessor implementiert Fine-grained Multithreading mit Round Robin.
+
+### Konfiguration
+
+Es gibt mehrere Konfigurationsmöglichkeiten, die als Generic-Parameter an der `Processor` Entität gesetzt werden:
+* `ThreadCount`: Die Anzahl der Threads. Frei wählbar.
+* `ThreadStart`:
+    * `start_0`: Alle Threads werden sofort gestartet und führen die selben Instruktionen, beginnend bei Adresse 0, aus.
+    * `start_offset`: Alle Threads werden sofort gestartet, führen jedoch unterschiedliche Instruktionen aus, beginnend bei einem festen Offset (z.B. Thread 0 bei 0x0, Thread 1 bei 0x100)
+    * `spawn`: Nur Thread 0 wird gestartet. Weitere Threads können mit einer speziellen Instruktion an einer bestimmten Adresse starten. (s. [_Zusätzliche Instruktionen_](#zusätzliche-instruktionen))
 
 ### Anpassungen an der Pipeline
 
@@ -52,11 +58,11 @@ Dieser Prozessor implementiert Fine-grained Multithreading mit Round Robin. Es g
 * Clear/Interlock/Forward  
   Die jeweilige Aktion ist nur valide, wenn sie den selben Thread betrifft, der sie ausgelöst hat. Z.B. darf Thread X nur Daten geforwardet bekommen, welche von ihm selbst geschrieben wurden, auch wenn ein anderer Thread zur gleichen Zeit das gleiche Register schreibt. Auch hierfür werden die ThreadTags der jeweiligen Stufen zusätzlich zu dem eigentlichen Signal mitgegeben.
 
-* Fetch  
-  Damit jeder Thread seinen eigenen Program Counter hat wurde das `PC` Signal zu einem Array indexiert mit dem ThreadTag. Die Fetch-Stufe speichert zuerst für den aktuellen Thread den nächsten PC (PC+4) in das Array und wählt dann den nächsten aktiven Thread zum Ausführen und nimmt dessen PC aus dem Array.  
+* Fetch-Stufe  
+  Damit für jeden Thread ein Program Counter gespeichert werden kann hat wurde das `PC` Signal als Array implementiert, indexierbar mit dem ThreadTag. Jeden Takt speichert die Fetch-Stufe zuerst den nächsten PC (PC+4) für den aktuellen Thread in das Array und wählt dann den nächsten (aktiven) Thread zum Ausführen und liest dessen PC aus dem Array.  
   Besondere Behandlung benötigen in der Fetch-Stufe Jumps. Auch hier muss wieder der ThreadTag des den Sprung ausführenden Threads mitgegeben werden, damit dessen PC entsprechend angepasst werden kann.
 
-* Stalling  
+* Stalls bei Speicherzugriffen  
   Da die Memory-Einheit nicht gepipelined ist muss der Prozessor entgegen der eigentlichen Idee von Multithreading bei Speicherzugriffen weiterhin komplett gestalled werden. Dies ist der Fall, da das Thread-Wechseln in der Fetch-Stufe stattfindet. Eine mögliche Erweiterung wäre es, andere Threads, die keine Speicherzugriffe ausführen, nicht zu stallen.
 
 ### Zusätzliche Instruktionen
@@ -75,3 +81,4 @@ Es wurden zwei zusätzliche CSR-Befehle implementiert:
   la    #reg, #address
   csrw  0x702, #reg
   ```
+  Dieser Befehl ist ähnlich wie ein Jump implementiert. Die EX-Stufe reicht der Fetch-Stufe den ThreadTag des zu spawnenden Threads, sowie die Spawn-Adresse weiter. Die Fetch-Stufe schreibt dann in das PC-Array.
