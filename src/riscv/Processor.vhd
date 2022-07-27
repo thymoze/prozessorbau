@@ -9,8 +9,7 @@ use work.util.all;
 entity Processor is
     generic (
         ThreadCount : integer := THREAD_COUNT;
-        ThreadStart : thread_start_t := start_0;
-        ThreadScheduling : scheduling_t := round_robin
+        ThreadStart : thread_start_t := spawn
     );
     port (
         CLK : in std_logic;
@@ -137,7 +136,6 @@ begin
     fetch : entity work.Fetch
         generic map(
             ThreadCount => ThreadCount,
-            ThreadScheduling => ThreadScheduling,
             ThreadStart => ThreadStart
         )
         port map(

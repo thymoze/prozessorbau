@@ -8,7 +8,6 @@ use work.util.all;
 entity Fetch is
     generic (
         ThreadCount : integer;
-        ThreadScheduling : scheduling_t;
         ThreadStart : thread_start_t
     );
     port (

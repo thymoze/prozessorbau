@@ -7,8 +7,7 @@ package types is
 
     subtype thread_tag_t is integer range 0 to THREAD_COUNT - 1;
 
-    type scheduling_t is (round_robin);
-    type thread_start_t is (start_0, spawn);
+    type thread_start_t is (start_0, start_offset, spawn);
 
     type thread_pc_array_t is array (0 to THREAD_COUNT - 1) of std_logic_vector(31 downto 0);
 
