@@ -17,7 +17,7 @@ int main()
 {
     int target;
     asm volatile ("la %0, _spawn" : "=r"(target));
-    asm volatile ("csrw 0x702, %0" :: "r"(target));
+    asm volatile ("csrw 0x701, %0" :: "r"(target));
     int x = 120;
     int y = 230;
     int z = x + y;

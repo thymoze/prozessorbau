@@ -4,25 +4,27 @@ use IEEE.numeric_std.all;
 use work.constants.all;
 use work.types.all;
 use work.seven_seg.all;
+use work.util.all;
 
 entity Processor is
     generic (
         ThreadCount : integer := THREAD_COUNT;
-        ThreadStart : thread_start_t := spawn;
+        ThreadStart : thread_start_t := start_0;
         ThreadScheduling : scheduling_t := round_robin
     );
     port (
         CLK : in std_logic;
         RST : in std_logic;
 
-        SevenSeg : out SevenSegData
+        SevenSeg : out SevenSegData;
+        ActiveThreads : out std_logic_vector(ThreadCount - 1 downto 0)
     );
 end Processor;
 
 architecture Behavioral of Processor is
     -- instruction fetch
-    signal IF_PC : std_logic_vector (31 downto 0);
-    signal IF_PCNext : std_logic_vector (31 downto 0);
+    signal IF_PC : thread_pc_array_t;
+    signal IF_PCNext : thread_pc_array_t;
     signal IF_ImemAddr : std_logic_vector(9 downto 0);
     signal IF_ThreadTag : thread_tag_t := 0;
     signal IF_ThreadTagNext : thread_tag_t := 0;
@@ -122,9 +124,6 @@ begin
     -- INSTRUCTION FETCH --
     -----------------------
     fetchStage : entity work.FetchStage
-        generic map(
-            ThreadStart => ThreadStart
-        )
         port map(
             CLK => CLK, RST => RST,
 
@@ -142,7 +141,6 @@ begin
             ThreadStart => ThreadStart
         )
         port map(
-            RST => RST,
             ThreadTagI => IF_ThreadTag,
             PCI => IF_PC,
             Jump => EX_JumpO,
@@ -156,7 +154,8 @@ begin
             ThreadTagNext => IF_ThreadTagNext,
             PC => IF_ID_PC,
             ThreadTagO => IF_ID_ThreadTag,
-            ImemAddr => IF_ImemAddr
+            ImemAddr => IF_ImemAddr,
+            ActiveThreads => ActiveThreads
         );
 
     imem : entity work.imemory
@@ -225,7 +224,6 @@ begin
         port map(
             CLK => CLK, RST => RST,
 
-            Stall => MEM_Stall,
             RdThreadTag => ID_ThreadTag,
             RdRegNo1 => ID_SrcReg1, RdRegNo2 => ID_SrcReg2,
             WrThreadTag => MEM_ID_ThreadTag,

@@ -42,7 +42,7 @@ end ALU;
 architecture Behavioral of ALU is
 
 begin
-    process (A, B, FunctI, Aux, PCNext, JumpI, JumpRelI, JumpTargetI, MemAccessI, MemWrEn, SrcData2, DestRegNoI, DestWrEnI, Clear)
+    process (A, B, FunctI, Aux, PCNext, JumpI, JumpRelI, JumpTargetI, MemAccessI, MemWrEn, SrcData2, DestRegNoI, DestWrEnI, Clear, ThreadTag, SetThreadTag, SpawnThreadI)
         variable result : std_logic_vector(31 downto 0);
         variable branch_cond : boolean;
     begin

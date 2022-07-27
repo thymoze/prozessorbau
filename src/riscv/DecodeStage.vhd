@@ -31,12 +31,14 @@ begin
             InterlockO <= (ThreadTag => 0, Value => '0');
             ClearO <= (ThreadTag => 0, Value => '0');
             ThreadTagO <= 0;
-        elsif rising_edge(CLK) and Stall = '0' then
-            InstO <= InstI;
-            PCO <= PCI;
-            InterlockO <= InterlockI;
-            ClearO <= ClearI;
-            ThreadTagO <= ThreadTagI;
+        elsif rising_edge(CLK) then
+            if Stall = '0' then
+                InstO <= InstI;
+                PCO <= PCI;
+                InterlockO <= InterlockI;
+                ClearO <= ClearI;
+                ThreadTagO <= ThreadTagI;
+            end if;
         end if;
     end process;
 end Behavioral;

@@ -26,9 +26,9 @@ architecture Behavioral of Forward is
 begin
     process (
         SrcRegNo1, SrcRegNo2,
-        SrcData1, SrcData2,
-        DestRegNo_EX, DestWrEn_EX, DestData_EX,
-        DestRegNo_MEM, DestWrEn_MEM, DestData_MEM)
+        SrcData1, SrcData2, ThreadTag,
+        DestRegNo_EX, DestWrEn_EX, DestData_EX, ThreadTag_EX,
+        DestRegNo_MEM, DestWrEn_MEM, DestData_MEM, ThreadTag_MEM)
 
     begin
         if ThreadTag = ThreadTag_EX and SrcRegNo1 /= "00000" and SrcRegNo1 = DestRegNo_EX and DestWrEn_EX = '1' then

@@ -12,7 +12,9 @@ asm(
 
 int main()
 {
-    int id;
+    register int id;
     asm volatile ("csrr %0, 0x71D" : "=r"(id));
+    id += 1;
+    id *= 1000;
     return id;
 }

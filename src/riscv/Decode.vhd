@@ -142,7 +142,7 @@ architecture Behavioral of Decode is
     end;
 
 begin
-    process (Inst, PC, Clear, InterlockI)
+    process (Inst, PC, Clear, InterlockI, ThreadTag)
         variable decoded_r : r_type;
         variable decoded_i : i_type;
         variable decoded_s : s_type;
@@ -171,7 +171,7 @@ begin
         SelSrc2 <= '0';
         Set7Seg <= '0';
         SetThreadTag <= '0';
-        SpawnThread <= 0;
+        SpawnThread <= thread_tag_t'(0);
 
         case opcode is
             when opcode_OP =>
@@ -197,14 +197,14 @@ begin
             when opcode_LUI =>
                 decoded_u := parse_u_type(Inst);
 
-                Imm <= std_logic_vector(decoded_u.imm & x"000");
+                Imm <= decoded_u.imm & std_logic_vector'(x"000");
                 DestRegNo <= decoded_u.rd;
                 DestWrEn <= '1';
 
             when opcode_AUIPC =>
                 decoded_u := parse_u_type(Inst);
 
-                Imm <= std_logic_vector(decoded_u.imm & x"000");
+                Imm <= decoded_u.imm & std_logic_vector'(x"000");
                 DestRegNo <= decoded_u.rd;
                 DestWrEn <= '1';
 
@@ -213,7 +213,7 @@ begin
 
                 Jump <= '1';
                 JumpRel <= '1';
-                JumpTarget <= std_logic_vector(signed(PC) + signed(decoded_j.imm & "0"));
+                JumpTarget <= std_logic_vector(signed(PC) + signed(std_logic_vector'(decoded_j.imm & "0")));
                 PCNext <= std_logic_vector(signed(PC) + 4);
                 DestRegNo <= decoded_j.rd;
                 DestWrEn <= '1';
@@ -233,7 +233,7 @@ begin
                 decoded_b := parse_b_type(Inst);
 
                 JumpRel <= '1';
-                JumpTarget <= std_logic_vector(signed(PC) + signed(decoded_b.imm & "0"));
+                JumpTarget <= std_logic_vector(signed(PC) + signed(std_logic_vector'((decoded_b.imm & "0"))));
                 SrcRegNo1 <= decoded_b.rs1;
                 SrcRegNo2 <= decoded_b.rs2;
                 SelSrc2 <= '1';

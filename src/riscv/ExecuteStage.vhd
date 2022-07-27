@@ -71,26 +71,28 @@ begin
             SetThreadTagO <= '0';
             ThreadTagO <= 0;
             SpawnThreadO <= 0;
-        elsif rising_edge(CLK) and Stall = '0' then
-            FunctO <= FunctI;
-            SrcData1O <= SrcData1I;
-            SrcData2O <= SrcData2I;
-            DestWrEnO <= DestWrEnI;
-            DestRegNoO <= DestRegNoI;
-            AuxO <= AuxI;
-            PCNextO <= PCNextI;
-            JumpO <= JumpI;
-            JumpRelO <= JumpRelI;
-            JumpTargetO <= JumpTargetI;
-            MemAccessO <= MemAccessI;
-            MemWrEnO <= MemWrEnI;
-            ClearO <= ClearI;
-            ImmO <= ImmI;
-            SelSrc2O <= SelSrc2I;
-            Set7SegO <= Set7SegI;
-            SetThreadTagO <= SetThreadTagI;
-            ThreadTagO <= ThreadTagI;
-            SpawnThreadO <= SpawnThreadI;
+        elsif rising_edge(CLK) then
+            if Stall = '0' then
+                FunctO <= FunctI;
+                SrcData1O <= SrcData1I;
+                SrcData2O <= SrcData2I;
+                DestWrEnO <= DestWrEnI;
+                DestRegNoO <= DestRegNoI;
+                AuxO <= AuxI;
+                PCNextO <= PCNextI;
+                JumpO <= JumpI;
+                JumpRelO <= JumpRelI;
+                JumpTargetO <= JumpTargetI;
+                MemAccessO <= MemAccessI;
+                MemWrEnO <= MemWrEnI;
+                ClearO <= ClearI;
+                ImmO <= ImmI;
+                SelSrc2O <= SelSrc2I;
+                Set7SegO <= Set7SegI;
+                SetThreadTagO <= SetThreadTagI;
+                ThreadTagO <= ThreadTagI;
+                SpawnThreadO <= SpawnThreadI;
+            end if;
         end if;
     end process;
 
