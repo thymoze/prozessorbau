@@ -25,8 +25,11 @@ architecture Behavioral of FetchStage is
         variable result : thread_pc_array_t;
     begin
         for i in 0 to THREAD_COUNT - 1 loop
-            result(i) := std_logic_vector(resize(i * unsigned'(x"100"), 32));
+            result(i) := std_logic_vector(resize(i * signed'(x"100"), 32));
         end loop;
+        -- the pipeline begins with thread 0, so to avoid skipping inst 0
+        -- we need to subtract one inst
+        result(0) := std_logic_vector(signed(result(0)) - 4);
         return result;
     end function;
 begin

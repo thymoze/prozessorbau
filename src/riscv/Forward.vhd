@@ -31,6 +31,8 @@ begin
         DestRegNo_MEM, DestWrEn_MEM, DestData_MEM, ThreadTag_MEM)
 
     begin
+        -- only forward if same thread wants to write to the same register:
+
         if ThreadTag = ThreadTag_EX and SrcRegNo1 /= "00000" and SrcRegNo1 = DestRegNo_EX and DestWrEn_EX = '1' then
             FwdData1 <= DestData_EX;
         elsif ThreadTag = ThreadTag_MEM and SrcRegNo1 /= "00000" and SrcRegNo1 = DestRegNo_MEM and DestWrEn_MEM = '1' then

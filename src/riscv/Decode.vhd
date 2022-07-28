@@ -204,7 +204,7 @@ begin
             when opcode_AUIPC =>
                 decoded_u := parse_u_type(Inst);
 
-                Imm <= decoded_u.imm & std_logic_vector'(x"000");
+                Imm <= std_logic_vector(signed(PC) + signed(std_logic_vector'(decoded_u.imm & x"000")));
                 DestRegNo <= decoded_u.rd;
                 DestWrEn <= '1';
 

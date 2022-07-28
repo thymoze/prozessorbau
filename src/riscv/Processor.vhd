@@ -9,7 +9,7 @@ use work.util.all;
 entity Processor is
     generic (
         ThreadCount : integer := THREAD_COUNT;
-        ThreadStart : thread_start_t := start_offset
+        ThreadStart : thread_start_t := spawn
     );
     port (
         CLK : in std_logic;
@@ -317,11 +317,6 @@ begin
             SpawnThreadO => EX_IF_SpawnThread, SpawnTargetO => EX_IF_SpawnTarget
         );
 
-    -- EX_IF_Jump <= EX_JumpO;
-    -- EX_IF_MemAccess <= EX_MEM_MemAccess;
-
-    -- EX_ID_Jump <= EX_JumpO;
-
     seven_seg : entity work.SevenSeg
         port map(
             CLK => CLK, RST => RST,
@@ -332,9 +327,9 @@ begin
             Pmod => SevenSeg
         );
 
-    --
-    -- MEM
-    --
+    ---------
+    -- MEM --
+    ---------
     memStage : entity work.MemStage
         port map(
             CLK => CLK, RST => RST,

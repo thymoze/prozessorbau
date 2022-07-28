@@ -61,8 +61,10 @@ begin
             PCNext <= PCI;
             ImemAddr <= PCI(ThreadTagI)(11 downto 2);
         else
+            -- select next thread
             for i in 1 to ThreadCount loop
                 thread_tag_next := (i + ThreadTagI) mod ThreadCount;
+                -- spawn can only select active threads:
                 exit when ThreadStart /= spawn or signed(thread_pc_next(thread_tag_next)) /= to_signed(-4, 32);
             end loop;
 
