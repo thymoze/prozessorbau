@@ -12,7 +12,7 @@ Entwickelt von David Heim im Rahmen des **Prozessorbau** Praktikums im SS22 an d
 ## Setup
 
 Das Vivado-Projekt wird automatisch aus TCL-Skripten generiert.
-Zum generieren und öffnen des Projekts:
+Zum Generieren und Öffnen des Projekts:
 ```bash
 $ vivado -mode tcl -source scripts/project.tcl
 ```
@@ -33,7 +33,7 @@ Der Code des jeweiligen Test-Programms liegt im Ordner `src/test_files/src/`.
 
 ## Multithreading
 
-Multithreading ist eine Form von Thread-level Parallelismus bei der sich mehrere Threads die Ausführungseinheiten eines Prozessors teilen. Jeder Thread benötigt seinen eigenen State, d.h. einen eigenen Program Counter und Register Set.
+Multithreading ist eine Form von Thread-level Parallelismus bei der sich mehrere Threads die Ausführungseinheiten eines Prozessors teilen. Jeder Thread benötigt seinen eigenen State, d.h. einen eigenen Program Counter und ein eigenes Register Set.
 
 Es gibt zwei verschiedene Ansätze für Multithreading bei einer Single-Issue CPU:
 
@@ -60,13 +60,13 @@ Es gibt mehrere Konfigurationsmöglichkeiten, die als Generic-Parameter an der `
   Jede Pipeline-Stufe muss wissen, welcher Thread gerade in ihr ausgeführt wird. Ein Signal `ThreadTag` wird dafür über alle Stufen durchgereicht.
 
 * Register  
-  Jeder Thread benötigt seinen eigenen kompletten Registersatz. Die Register werden hierfür in einem zweidimensionalen Array gespeichert, welches über ThreadTag und Register indexiert wird. Zum Lesen wird der aktuelle ThreadTag der Decode-Stufe und zum Schreiben der, der MEM-Stufe mitgegeben.
+  Jeder Thread benötigt seinen eigenen kompletten Registersatz. Die Register werden hierfür in einem zweidimensionalen Array gespeichert, welches über ThreadTag und Register indexiert wird. Zum Lesen wird der aktuelle ThreadTag der Decode-Stufe und zum Schreiben der ThreadTag der MEM-Stufe mitgegeben.
 
 * Clear/Interlock/Forward  
   Die jeweilige Aktion ist nur valide, wenn sie den selben Thread betrifft, der sie ausgelöst hat. Z.B. darf Thread X nur Daten geforwardet bekommen, welche von ihm selbst geschrieben wurden, auch wenn ein anderer Thread zur gleichen Zeit das gleiche Register schreibt. Auch hierfür werden die ThreadTags der jeweiligen Stufen zusätzlich zu dem eigentlichen Signal mitgegeben.
 
 * Fetch-Stufe  
-  Damit für jeden Thread ein Program Counter gespeichert werden kann hat wurde das `PC` Signal als Array implementiert, indexierbar mit dem ThreadTag. Jeden Takt speichert die Fetch-Stufe zuerst den nächsten PC (PC+4) für den aktuellen Thread in das Array und wählt dann den nächsten (aktiven) Thread zum Ausführen und liest dessen PC aus dem Array.  
+  Damit für jeden Thread ein Program Counter gespeichert werden kann, wurde das `PC` Signal als Array implementiert, indexierbar mit dem ThreadTag. Jeden Takt speichert die Fetch-Stufe zuerst den nächsten PC (PC+4) für den aktuellen Thread in das Array und wählt dann den nächsten (aktiven) Thread zum Ausführen und liest dessen PC aus dem Array.  
   Besondere Behandlung benötigen in der Fetch-Stufe Jumps. Auch hier muss wieder der ThreadTag des den Sprung ausführenden Threads mitgegeben werden, damit dessen PC entsprechend angepasst werden kann.
 
 * Stalls bei Speicherzugriffen  
